@@ -27,7 +27,6 @@ public class MainActivity extends Activity {
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
-
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -37,14 +36,13 @@ public class MainActivity extends Activity {
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-        View v = findViewById(id);
         //noinspection SimplifiableIfStatement
         switch(id) {
             case R.id.action_add_item:
-                showPopup(v);
+                showPopup(findViewById(id));
                 return true;
             case R.id.action_search:
-                openSearch(v);
+                openSearch(item.getActionView());
                 return true;
             case R.id.action_settings:
                 //openSettings();
@@ -62,7 +60,13 @@ public class MainActivity extends Activity {
     }
 
     public void openSearch(View v) {
-// Get the action view of the Item whose id is action_search
         EditText txtSearch = (EditText) v.findViewById(R.id.txt_search);
+        txtSearch.setOnEditorActionListener(new OnEditorActionListener() {
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                Toast toast = Toast.makeText(getBaseContext(), "Search : " + v.getText(), Toast.LENGTH_SHORT);
+                toast.show();
+                return false;
+            }
+        });
     }
 }

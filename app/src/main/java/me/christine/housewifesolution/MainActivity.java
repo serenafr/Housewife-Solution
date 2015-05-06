@@ -4,9 +4,11 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
 import android.widget.Toast;
@@ -26,17 +28,6 @@ public class MainActivity extends Activity {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
 
-        MenuItem searchItem = menu.findItem(R.id.action_search);
-        // Get the action view of the Item whose id is action_search
-        View v = (View) searchItem.getActionView();
-        EditText txtSearch = (EditText) v.findViewById(R.id.txt_search);
-        // Set an action listener
-        txtSearch.setOnEditorActionListener(new OnEditorActionListener(){
-            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                Toast.makeText(getBaseContext(), "Search: " + v.getText(), Toast.LENGTH_SHORT).show();
-                return false;
-            }
-        });
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -46,14 +37,14 @@ public class MainActivity extends Activity {
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-
+        View v = findViewById(id);
         //noinspection SimplifiableIfStatement
         switch(id) {
             case R.id.action_add_item:
-                //openAddItem();
+                showPopup(v);
                 return true;
             case R.id.action_search:
-                //openSearch();
+                openSearch(v);
                 return true;
             case R.id.action_settings:
                 //openSettings();
@@ -61,5 +52,17 @@ public class MainActivity extends Activity {
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+    public void showPopup(View v) {
+        PopupMenu popup;
+        popup = new PopupMenu(this, v);
+        MenuInflater inflater = popup.getMenuInflater();
+        inflater.inflate(R.menu.menu_add, popup.getMenu());
+        popup.show();
+    }
+
+    public void openSearch(View v) {
+// Get the action view of the Item whose id is action_search
+        EditText txtSearch = (EditText) v.findViewById(R.id.txt_search);
     }
 }

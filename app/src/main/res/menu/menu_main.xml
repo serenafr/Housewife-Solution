@@ -12,12 +12,12 @@
         android:id="@+id/action_add_item"
         android:title="Add Items"
         android:icon="@drawable/ic_add_item"
-        android:showAsAction="always|collapseActionView"/>
+        android:showAsAction="always"/>
 
     <item
         android:id="@+id/action_search"
         android:title="Search"
         android:icon="@drawable/ic_action_search"
-        android:showAsAction="ifRoom|collapseActionView"
+        android:showAsAction="always|collapseActionView"
         android:actionLayout="@layout/search_layout"/>
 </menu>

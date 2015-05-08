@@ -7,7 +7,34 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     android:paddingBottom="@dimen/activity_vertical_margin" tools:context=".MainActivity">
 
-    <TextView android:text="@string/to_do_list"
+        <FrameLayout
+            android:id="@+id/fragment_layout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+            <fragment
+                android:name="me.christine.housewifesolution.ShopFragment"
+                android:id="@+id/shopfragment"
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"/>
+
+            <fragment
+                android:name="me.christine.housewifesolution.ToDoFragment"
+                android:id="@+id/todofragment"
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"/>
+
+            <fragment
+                android:name="me.christine.housewifesolution.RecipeFragment"
+                android:id="@+id/recipefragment"
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"/>
+
+            </FrameLayout>
+
+        <TextView android:text="@string/to_do_list"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 

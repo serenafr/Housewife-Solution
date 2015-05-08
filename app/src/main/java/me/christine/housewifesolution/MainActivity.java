@@ -1,5 +1,6 @@
 package me.christine.housewifesolution;
 
+import android.app.ActionBar;
 import android.app.Activity;
 import android.os.Bundle;
 import android.view.KeyEvent;
@@ -12,6 +13,7 @@ import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
 import android.widget.Toast;
+import android.app.ActionBar.Tab;
 
 
 public class MainActivity extends Activity {
@@ -20,6 +22,7 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        setupTabs();
     }
 
 
@@ -68,5 +71,30 @@ public class MainActivity extends Activity {
                 return false;
             }
         });
+    }
+
+    private void setupTabs() {
+        ActionBar actionBar = getActionBar();
+        actionBar.setNavigationMode(actionBar.NAVIGATION_MODE_TABS);
+        actionBar.setDisplayShowTitleEnabled(true);
+
+        Tab tab1 = actionBar
+                .newTab()
+                .setText("Shopping")
+                .setTabListener(new FragmentTabListener<ShopFragment>(this, "shopping", ShopFragment.class));
+        actionBar.addTab(tab1);
+        actionBar.selectTab(tab1);
+
+        Tab tab2 = actionBar
+                .newTab()
+                .setText("To_do")
+                .setTabListener(new FragmentTabListener<ToDoFragment>(this, "to_do", ToDoFragment.class));
+        actionBar.addTab(tab2);
+
+        Tab tab3 = actionBar
+                .newTab()
+                .setText("Recipe")
+                .setTabListener(new FragmentTabListener<RecipeFragment>(this, "recipe", RecipeFragment.class));
+        actionBar.addTab(tab3);
     }
 }

@@ -15,14 +15,13 @@ import android.widget.TextView.OnEditorActionListener;
 import android.widget.Toast;
 import android.app.ActionBar.Tab;
 
-
 public class MainActivity extends Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
         setupTabs();
+        setContentView(R.layout.activity_main);
     }
 
 
@@ -83,7 +82,6 @@ public class MainActivity extends Activity {
                 .setText("Shopping")
                 .setTabListener(new FragmentTabListener<ShopFragment>(this, "shopping", ShopFragment.class));
         actionBar.addTab(tab1);
-        actionBar.selectTab(tab1);
 
         Tab tab2 = actionBar
                 .newTab()

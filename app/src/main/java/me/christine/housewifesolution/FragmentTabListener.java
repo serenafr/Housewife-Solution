@@ -7,6 +7,7 @@ import android.app.Activity;
 import android.app.ActionBar.Tab;
 import android.app.ActionBar.TabListener;
 
+
 public class FragmentTabListener<T extends Fragment> implements TabListener {
     private Fragment mFragment;
     private final Activity mActivity;
@@ -58,7 +59,7 @@ public class FragmentTabListener<T extends Fragment> implements TabListener {
 
     public void onTabUnselected(Tab tab, FragmentTransaction ft) {
         FragmentTransaction sft = mActivity.getFragmentManager().beginTransaction();
-        if (mFragment == null) {
+        if (mFragment != null) {
             sft.detach(mFragment);
         }
         sft.commit();
@@ -67,4 +68,5 @@ public class FragmentTabListener<T extends Fragment> implements TabListener {
     public void onTabReselected(Tab tab, FragmentTransaction ft) {
 
     }
+
 }

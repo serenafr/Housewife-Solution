@@ -22,7 +22,7 @@ public class ShopFragment extends Fragment {
         ItemAdapter adapter = new ItemAdapter(super.getActivity(), shoppingItems);
         ListView listView = (ListView) v.findViewById(R.id.shopping_list);
         listView.setAdapter(adapter);
-        ShoppingItem shoppingItem = new ShoppingItem("apple", 5);
+        ShoppingItem shoppingItem = new ShoppingItem("5 apples");
         adapter.add(shoppingItem);
         return v;
     }

@@ -14,6 +14,7 @@ import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
 import android.widget.Toast;
 import android.app.ActionBar.Tab;
+import android.content.Intent;
 
 public class MainActivity extends Activity {
 
@@ -59,6 +60,18 @@ public class MainActivity extends Activity {
         MenuInflater inflater = popup.getMenuInflater();
         inflater.inflate(R.menu.menu_add, popup.getMenu());
         popup.show();
+        popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                int id = item.getItemId();
+                Toast.makeText(MainActivity.this, item.getTitle(), Toast.LENGTH_SHORT).show();
+                switch(id) {
+                    case R.id.add_shopping_list:
+                        addShoppingListActivity();
+                }
+                return true;
+            }
+        });
     }
 
     public void openSearch(View v) {
@@ -94,5 +107,10 @@ public class MainActivity extends Activity {
                 .setText("Recipe")
                 .setTabListener(new FragmentTabListener<RecipeFragment>(this, "recipe", RecipeFragment.class));
         actionBar.addTab(tab3);
+    }
+
+    public void addShoppingListActivity() {
+        Intent intent = new Intent(this, AddShoppingListActivity.class);
+        startActivity(intent);
     }
 }

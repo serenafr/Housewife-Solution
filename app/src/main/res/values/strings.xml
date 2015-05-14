@@ -6,4 +6,6 @@
     <string name="recipes">方便面</string>
     <string name="shopping_list">Oranges</string>
     <string name="add_items_to_buy">Add Items to Buy</string>
+    <string name="name_item_to_buy">Item</string>
+    <string name="quantity_item_to_buy">Quantity</string>
 </resources>

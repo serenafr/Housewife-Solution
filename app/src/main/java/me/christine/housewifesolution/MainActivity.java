@@ -10,19 +10,23 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.PopupMenu;
+import android.widget.TabHost;
+import android.widget.TabWidget;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
 import android.widget.Toast;
 import android.app.ActionBar.Tab;
 import android.content.Intent;
+import android.widget.TabHost.TabSpec;
 
 public class MainActivity extends Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setupTabs();
         setContentView(R.layout.activity_main);
+        setupTabs();
+
     }
 
 
@@ -65,9 +69,9 @@ public class MainActivity extends Activity {
             public boolean onMenuItemClick(MenuItem item) {
                 int id = item.getItemId();
                 Toast.makeText(MainActivity.this, item.getTitle(), Toast.LENGTH_SHORT).show();
-                switch(id) {
+                switch (id) {
                     case R.id.add_shopping_list:
-                        addShoppingListActivity();
+
                 }
                 return true;
             }
@@ -86,10 +90,49 @@ public class MainActivity extends Activity {
     }
 
     private void setupTabs() {
-        ActionBar actionBar = getActionBar();
+
+        TabHost tabHost = (TabHost) findViewById(android.R.id.tabhost);
+
+        TabHost.TabSpec tab1, tab2, tab3;
+        tab1 = tabHost.
+                newTabSpec("First Tab").
+                setIndicator("Shopping").
+                setContent(new TabHost.TabContentFactory() {
+                    @Override
+                    public View createTabContent(String tag) {
+                        return new TextView(MainActivity.this);
+                    }
+                });
+
+
+        tab2 = tabHost.
+                newTabSpec("Second Tab").
+                setIndicator("To_do").
+                setContent(new TabHost.TabContentFactory() {
+                    @Override
+                    public View createTabContent(String tag) {
+                        return new TextView(MainActivity.this);
+                    }
+                });
+
+        tab3 = tabHost.
+                newTabSpec("Third Tab").
+                setIndicator("Recipe").
+                setContent(new TabHost.TabContentFactory() {
+                    @Override
+                    public View createTabContent(String tag) {
+                        return new TextView(MainActivity.this);
+                    }
+                });
+
+        tabHost.setup();
+        tabHost.addTab(tab1);
+        tabHost.addTab(tab2);
+        tabHost.addTab(tab3);
+
+        /*ActionBar actionBar = getActionBar();
         actionBar.setNavigationMode(actionBar.NAVIGATION_MODE_TABS);
         actionBar.setDisplayShowTitleEnabled(true);
-
         Tab tab1 = actionBar
                 .newTab()
                 .setText("Shopping")
@@ -106,11 +149,7 @@ public class MainActivity extends Activity {
                 .newTab()
                 .setText("Recipe")
                 .setTabListener(new FragmentTabListener<RecipeFragment>(this, "recipe", RecipeFragment.class));
-        actionBar.addTab(tab3);
-    }
+        actionBar.addTab(tab3);*/
 
-    public void addShoppingListActivity() {
-        Intent intent = new Intent(this, AddShoppingListActivity.class);
-        startActivity(intent);
     }
 }

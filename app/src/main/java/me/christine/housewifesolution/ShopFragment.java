@@ -26,47 +26,10 @@ public class ShopFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the Layout for this fragment;
         View v = inflater.inflate(R.layout.shoptag_layout, container, false);
-        this.getActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
-        ItemAdapter adapter = new ItemAdapter(super.getActivity(), shoppingItems);
-        ListView listView = (ListView) v.findViewById(R.id.shopping_list);
-        listView.setAdapter(adapter);
-        Button button = (Button) v.findViewById(R.id.add_shopping_item_button);
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                addShoppingItems();
-            }
-        });
+
         return v;
     }
 
-    public void addShoppingItems() {
-        View v = getView();
-        final EditText nameText = (EditText) v.findViewById(R.id.get_shopping_item_edit_text);
-        nameText.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                nameText.setHint(" ");
-            }
-        });
-        nameText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View v, boolean hasFocus) {
-                nameText.setHint(R.string.add_items_to_buy);
-            }
-        });
-        String name = nameText.getText().toString();
-        EditText quantityText = (EditText) v.findViewById(R.id.get_shopping_item_quantity_edit_text);
-        if(!TextUtils.isDigitsOnly(quantityText.getText())) {
-            //return false;
-        }
-        int number = Integer.parseInt(quantityText.getText().toString());
-        ShoppingItem newItem = new ShoppingItem(name, number);
-        ListView listView = (ListView) v.findViewById(R.id.shopping_list);
-        ItemAdapter adapter = (ItemAdapter) listView.getAdapter();
-        shoppingItems.add(newItem);
-        adapter.add(newItem);
-        adapter.notifyDataSetChanged();
-    }
+
 }
 

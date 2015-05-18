@@ -1,38 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/shop_content_layout"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        android:orientation="horizontal"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-        <TextView
-            android:id="@+id/show_item_name"
-            android:text="@string/name_item_to_buy"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
         <EditText
-            android:id="@+id/get_shopping_item_edit_text"
+            android:id="@+id/add_shopping_items"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/add_items_to_buy"
+            android:textSize="18dp"
+            android:background="@drawable/add_shopping_item_background"
+            android:onClick="addShoppingItems"
+            android:layout_centerVertical="true"/>
+
+        <ImageButton
+            android:id="@+id/add_shopping_cart"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:hint="@string/add_items_to_buy"/>
-        <TextView
-            android:text="@string/quantity_item_to_buy"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-        <EditText
-            android:id="@+id/get_shopping_item_quantity_edit_text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:hint="0"/>
-        <Button
-            android:id="@+id/add_shopping_item_button"
-            android:text="Add"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-    </LinearLayout>
+            android:src="@drawable/ic_action_add_shopping_cart"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_alignTop="@id/add_shopping_items"
+            android:layout_alignBottom="@id/add_shopping_items"
+            android:background="@android:color/transparent"/>
+    </RelativeLayout>
 
     <ListView
         android:id="@+id/shopping_list"
@@ -40,4 +37,4 @@
         android:layout_height="wrap_content">
     </ListView>
 
-</RelativeLayout>
+</LinearLayout>

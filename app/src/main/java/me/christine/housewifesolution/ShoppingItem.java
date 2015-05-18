@@ -5,9 +5,7 @@ package me.christine.housewifesolution;
  */
 public class ShoppingItem {
     public String name;
-    public int number;
-    public ShoppingItem(String name, int number) {
-        this.number = number;
+    public ShoppingItem(String name) {
         this.name = name;
     }
 }

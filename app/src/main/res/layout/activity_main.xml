@@ -15,7 +15,15 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:padding="5dip" />
+            android:padding="5dip">
+
+            <include layout="@layout/shoptag_layout"/>
+
+            <include layout="@layout/todotag_layout"/>
+
+            <include layout="@layout/recipetag_layout"/>
+
+        </FrameLayout>
 
         <TabWidget
             android:id="@android:id/tabs"

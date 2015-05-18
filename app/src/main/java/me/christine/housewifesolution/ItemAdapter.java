@@ -14,7 +14,6 @@ import android.widget.TextView;
 public class ItemAdapter extends ArrayAdapter<ShoppingItem> {
     private static class ViewHolder {
         TextView name;
-        TextView number;
     }
 
     public ItemAdapter(Context context, ArrayList<ShoppingItem> shoppingItems) {
@@ -30,14 +29,12 @@ public class ItemAdapter extends ArrayAdapter<ShoppingItem> {
             LayoutInflater inflater = LayoutInflater.from(getContext());
             convertView = inflater.inflate(R.layout.shopping_item_layout, parent, false);
             viewHolder.name = (TextView) convertView.findViewById(R.id.itemName);
-            viewHolder.number = (TextView) convertView.findViewById(R.id.itemNumber);
             convertView.setTag(viewHolder);
         } else {
             viewHolder = (ViewHolder) convertView.getTag();
         }
 
         viewHolder.name.setText(shoppingItem.name);
-        viewHolder.number.setText(Integer.toString(shoppingItem.number));
 
         return convertView;
     }

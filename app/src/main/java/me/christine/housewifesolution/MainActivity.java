@@ -7,26 +7,30 @@ import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.ListView;
 import android.widget.PopupMenu;
 import android.widget.TabHost;
-import android.widget.TabWidget;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
 import android.widget.Toast;
-import android.app.ActionBar.Tab;
-import android.content.Intent;
-import android.widget.TabHost.TabSpec;
+import java.util.ArrayList;
 
 public class MainActivity extends Activity {
+
+    public ArrayList<ShoppingItem> arrayOfItems = new ArrayList<ShoppingItem>();
+    public ItemAdapter itemAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         setupTabs();
-
+        itemAdapter = new ItemAdapter(this, arrayOfItems);
+        setItemAdapter(itemAdapter);
     }
 
 
@@ -92,40 +96,25 @@ public class MainActivity extends Activity {
     private void setupTabs() {
 
         TabHost tabHost = (TabHost) findViewById(android.R.id.tabhost);
+        tabHost.setup();
 
         TabHost.TabSpec tab1, tab2, tab3;
         tab1 = tabHost.
                 newTabSpec("First Tab").
                 setIndicator("Shopping").
-                setContent(new TabHost.TabContentFactory() {
-                    @Override
-                    public View createTabContent(String tag) {
-                        return new TextView(MainActivity.this);
-                    }
-                });
+                setContent(R.id.shop_content_layout);
 
 
         tab2 = tabHost.
                 newTabSpec("Second Tab").
                 setIndicator("To_do").
-                setContent(new TabHost.TabContentFactory() {
-                    @Override
-                    public View createTabContent(String tag) {
-                        return new TextView(MainActivity.this);
-                    }
-                });
+                setContent(R.id.todo_content_layout);
 
         tab3 = tabHost.
                 newTabSpec("Third Tab").
                 setIndicator("Recipe").
-                setContent(new TabHost.TabContentFactory() {
-                    @Override
-                    public View createTabContent(String tag) {
-                        return new TextView(MainActivity.this);
-                    }
-                });
+                setContent(R.id.recipe_content_layout);
 
-        tabHost.setup();
         tabHost.addTab(tab1);
         tabHost.addTab(tab2);
         tabHost.addTab(tab3);
@@ -151,5 +140,27 @@ public class MainActivity extends Activity {
                 .setTabListener(new FragmentTabListener<RecipeFragment>(this, "recipe", RecipeFragment.class));
         actionBar.addTab(tab3);*/
 
+    }
+
+    protected void setItemAdapter(ItemAdapter itemAdapter) {
+        ListView listView = (ListView) findViewById(R.id.shopping_list);
+        listView.setAdapter(itemAdapter);
+    }
+
+    public void addShoppingItems(View v) {
+        final EditText editText = (EditText) findViewById(R.id.add_shopping_items);
+        ImageButton imageButton = (ImageButton) findViewById(R.id.add_shopping_cart);
+        imageButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                editText.setSelectAllOnFocus(true);
+                String str = editText.getText().toString();
+                if (str.length() > 0) {
+                    ShoppingItem newItem = new ShoppingItem(str);
+                    arrayOfItems.add(newItem);
+                    itemAdapter.notifyDataSetChanged();
+                }
+            }
+        });
     }
 }

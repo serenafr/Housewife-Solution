@@ -2,6 +2,8 @@ package me.christine.housewifesolution;
 
 import android.app.ActionBar;
 import android.app.Activity;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -17,6 +19,13 @@ import android.widget.TabHost;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
 import android.widget.Toast;
+
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 
 public class MainActivity extends Activity {
@@ -31,6 +40,7 @@ public class MainActivity extends Activity {
         setupTabs();
         itemAdapter = new ItemAdapter(this, arrayOfItems);
         setItemAdapter(itemAdapter);
+        showShoppingList();
     }
 
 
@@ -150,17 +160,50 @@ public class MainActivity extends Activity {
     public void addShoppingItems(View v) {
         final EditText editText = (EditText) findViewById(R.id.add_shopping_items);
         ImageButton imageButton = (ImageButton) findViewById(R.id.add_shopping_cart);
+        SharedPreferences sharedPref = this.getPreferences(Context.MODE_PRIVATE);
+        final SharedPreferences.Editor editor = sharedPref.edit();
         imageButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                editText.setSelectAllOnFocus(true);
                 String str = editText.getText().toString();
                 if (str.length() > 0) {
+                    editText.selectAll();
                     ShoppingItem newItem = new ShoppingItem(str);
                     arrayOfItems.add(newItem);
                     itemAdapter.notifyDataSetChanged();
+                    writeToFile(str);
                 }
             }
         });
+    }
+
+    protected void writeToFile(String str) {
+        try {
+            FileOutputStream fos = openFileOutput("shopping_list", Context.MODE_APPEND|Context.MODE_WORLD_READABLE);
+            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(fos));
+            writer.write(str);
+            writer.newLine();
+            writer.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    protected void showShoppingList() {
+        ListView listView = (ListView) findViewById(R.id.shopping_list);
+        try {
+            BufferedReader inputReader = new BufferedReader(new InputStreamReader(
+                    openFileInput("shopping_list")));
+            String inputString;
+            StringBuffer stringBuffer = new StringBuffer();
+            while ((inputString = inputReader.readLine()) != null) {
+                stringBuffer.append(inputString + "\n");
+                ShoppingItem item = new ShoppingItem(inputString);
+                arrayOfItems.add(item);
+                itemAdapter.notifyDataSetChanged();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

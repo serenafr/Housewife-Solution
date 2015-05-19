@@ -14,7 +14,7 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:hint="@string/add_items_to_buy"
-            android:textSize="18dp"
+            android:textSize="20dp"
             android:background="@drawable/add_shopping_item_background"
             android:onClick="addShoppingItems"
             android:layout_centerVertical="true"/>

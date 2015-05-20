@@ -17,7 +17,8 @@
             android:textSize="20dp"
             android:background="@drawable/add_shopping_item_background"
             android:onClick="addShoppingItems"
-            android:layout_centerVertical="true"/>
+            android:layout_centerVertical="true"
+            android:singleLine="true"/>
 
         <ImageButton
             android:id="@+id/add_shopping_cart"
@@ -28,7 +29,7 @@
             android:layout_centerVertical="true"
             android:layout_alignTop="@id/add_shopping_items"
             android:layout_alignBottom="@id/add_shopping_items"
-            android:background="@android:color/transparent"/>
+            android:background="@drawable/add_shopping_item_background"/>
     </RelativeLayout>
 
     <ListView

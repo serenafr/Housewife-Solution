@@ -18,15 +18,18 @@ import android.widget.TabHost;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
 import android.widget.Toast;
-import android.graphics.Color;
+import android.widget.ImageView;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
+import java.io.File;
+import java.io.PrintWriter;
 
 public class MainActivity extends Activity {
 
@@ -210,6 +213,42 @@ public class MainActivity extends Activity {
             }
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    public void deleteShoppingItem(View v) {
+        final ListView listView = (ListView) findViewById(R.id.shopping_list);
+        ImageView imageView = (ImageView) findViewById(R.id.deleteItem);
+        imageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int position = listView.getPositionForView(v);
+                deleteItemFromStorage(position);
+                //delete from the listview
+                listView.removeViewInLayout(v);
+                itemAdapter.notifyDataSetChanged();
+            }
+        });
+    }
+
+    public void deleteItemFromStorage(int position) {
+        arrayOfItems.remove(position);
+        updateFile(arrayOfItems);
+    }
+
+    public void updateFile(ArrayList<ShoppingItem> arrayOfItems) {
+        try {
+            FileOutputStream fos = openFileOutput("shopping_list", Context.MODE_PRIVATE);
+            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(fos));
+            writer.write("");
+            writer.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+       for (int i = 0; i < arrayOfItems.size(); i++) {
+            ShoppingItem shoppingItem = arrayOfItems.get(i);
+            String itemName = shoppingItem.getName();
+            writeToFile(itemName);
         }
     }
 }

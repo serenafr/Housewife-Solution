@@ -7,7 +7,6 @@ import android.content.Context;
 import java.util.ArrayList;
 import android.view.View;
 import android.widget.TextView;
-import android.graphics.Color;
 
 /**
  * Created by christine on 15-5-12.
@@ -34,12 +33,6 @@ public class ItemAdapter extends ArrayAdapter<ShoppingItem> {
         } else {
             viewHolder = (ViewHolder) convertView.getTag();
         }
-        /*convertView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                v.setBackgroundColor(Color.RED);
-            }
-        });*/
         viewHolder.name.setText(shoppingItem.getName());
         return convertView;
     }

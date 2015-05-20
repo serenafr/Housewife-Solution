@@ -5,8 +5,8 @@
     <item android:id="@+id/add_shopping_list"
         android:title="Shopping List"
         android:showAsAction="always"/>
-    <item android:id="@+id/add_to_do_list"
-        android:title="To-do List"
+    <item android:id="@+id/add_card_list"
+        android:title="Cards List"
         android:showAsAction="always"/>
     <item android:id="@+id/recipe"
         android:title="Recipe"

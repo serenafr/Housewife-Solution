@@ -8,4 +8,7 @@ public class ShoppingItem {
     public ShoppingItem(String name) {
         this.name = name;
     }
+    public String getName() {
+        return this.name;
+    }
 }

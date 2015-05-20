@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">Housewife Solution</string>
 
-    <string name="to_do_list">You don\'t have upcoming event!</string>
+    <string name="cards_list">CVS</string>
     <string name="action_settings">Settings</string>
     <string name="recipes">方便面</string>
     <string name="shopping_list">Oranges</string>

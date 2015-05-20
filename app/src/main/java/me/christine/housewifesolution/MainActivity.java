@@ -1,16 +1,15 @@
 package me.christine.housewifesolution;
 
-import android.app.ActionBar;
+
 import android.app.Activity;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
@@ -19,6 +18,7 @@ import android.widget.TabHost;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
 import android.widget.Toast;
+import android.graphics.Color;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -117,8 +117,8 @@ public class MainActivity extends Activity {
 
         tab2 = tabHost.
                 newTabSpec("Second Tab").
-                setIndicator("To_do").
-                setContent(R.id.todo_content_layout);
+                setIndicator("Cards").
+                setContent(R.id.cards_content_layout);
 
         tab3 = tabHost.
                 newTabSpec("Third Tab").
@@ -152,16 +152,23 @@ public class MainActivity extends Activity {
 
     }
 
-    protected void setItemAdapter(ItemAdapter itemAdapter) {
-        ListView listView = (ListView) findViewById(R.id.shopping_list);
+    protected void setItemAdapter(final ItemAdapter itemAdapter) {
+        final ListView listView = (ListView) findViewById(R.id.shopping_list);
+        final EditText editText = (EditText) findViewById(R.id.add_shopping_items);
         listView.setAdapter(itemAdapter);
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                ShoppingItem selectedItem = itemAdapter.getItem(position);
+                Toast.makeText(getApplicationContext(), selectedItem.getName(), Toast.LENGTH_SHORT).show();
+                itemAdapter.notifyDataSetChanged();
+            }
+        });
     }
 
     public void addShoppingItems(View v) {
         final EditText editText = (EditText) findViewById(R.id.add_shopping_items);
         ImageButton imageButton = (ImageButton) findViewById(R.id.add_shopping_cart);
-        SharedPreferences sharedPref = this.getPreferences(Context.MODE_PRIVATE);
-        final SharedPreferences.Editor editor = sharedPref.edit();
         imageButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -190,7 +197,6 @@ public class MainActivity extends Activity {
     }
 
     protected void showShoppingList() {
-        ListView listView = (ListView) findViewById(R.id.shopping_list);
         try {
             BufferedReader inputReader = new BufferedReader(new InputStreamReader(
                     openFileInput("shopping_list")));

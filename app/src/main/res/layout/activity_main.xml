@@ -19,7 +19,7 @@
 
             <include layout="@layout/shoptag_layout"/>
 
-            <include layout="@layout/todotag_layout"/>
+            <include layout="@layout/cardstag_layout"/>
 
             <include layout="@layout/recipetag_layout"/>
 

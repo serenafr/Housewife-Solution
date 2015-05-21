@@ -157,7 +157,6 @@ public class MainActivity extends Activity {
 
     protected void setItemAdapter(final ItemAdapter itemAdapter) {
         final ListView listView = (ListView) findViewById(R.id.shopping_list);
-        final EditText editText = (EditText) findViewById(R.id.add_shopping_items);
         listView.setAdapter(itemAdapter);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -216,19 +215,13 @@ public class MainActivity extends Activity {
         }
     }
 
-    public void deleteShoppingItem(View v) {
+    public void deleteShoppingItem(View v, ImageView imageView) {
         final ListView listView = (ListView) findViewById(R.id.shopping_list);
-        ImageView imageView = (ImageView) findViewById(R.id.deleteItem);
-        imageView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                int position = listView.getPositionForView(v);
-                deleteItemFromStorage(position);
-                //delete from the listview
-                listView.removeViewInLayout(v);
-                itemAdapter.notifyDataSetChanged();
-            }
-        });
+        int position = listView.getPositionForView(v);
+        deleteItemFromStorage(position);
+        //delete from the listview
+        listView.removeViewInLayout(v);
+        itemAdapter.notifyDataSetChanged();
     }
 
     public void deleteItemFromStorage(int position) {

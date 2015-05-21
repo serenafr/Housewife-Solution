@@ -1,5 +1,7 @@
 package me.christine.housewifesolution;
 
+import android.widget.ImageView;
+
 /**
  * Created by christine on 15-5-12.
  */

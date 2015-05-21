@@ -170,18 +170,36 @@ public class MainActivity extends Activity {
 
     public void addShoppingItems(View v) {
         final EditText editText = (EditText) findViewById(R.id.add_shopping_items);
-        ImageButton imageButton = (ImageButton) findViewById(R.id.add_shopping_cart);
-        imageButton.setOnClickListener(new View.OnClickListener() {
+        editText.setOnKeyListener(new View.OnKeyListener() {
+            @Override
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+                if (event != null && event.getAction() == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_ENTER) {
+                    String str = editText.getText().toString();
+                    if (str.length() > 0) {
+                        editText.selectAll();
+                        ShoppingItem newItem = new ShoppingItem(str);
+                        arrayOfItems.add(newItem);
+                        itemAdapter.notifyDataSetChanged();
+                        writeToFile(str);
+                    }
+                    return true;
+                }
+                return false;
+            }
+        });
+        ImageView imageView = (ImageView) findViewById(R.id.delete_input_text);
+        imageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String str = editText.getText().toString();
+                editText.setText("");
+                /*String str = editText.getText().toString();
                 if (str.length() > 0) {
                     editText.selectAll();
                     ShoppingItem newItem = new ShoppingItem(str);
                     arrayOfItems.add(newItem);
                     itemAdapter.notifyDataSetChanged();
                     writeToFile(str);
-                }
+                }*/
             }
         });
     }

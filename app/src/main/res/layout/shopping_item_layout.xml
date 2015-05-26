@@ -13,7 +13,7 @@
         android:textColor="@drawable/shopping_item_text_selector"
         android:textSize="20dp"/>
     <ImageView
-        android:id="@+id/deleteItem"
+        android:id="@+id/delete_item"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"

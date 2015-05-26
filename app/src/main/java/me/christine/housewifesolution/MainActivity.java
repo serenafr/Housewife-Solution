@@ -2,7 +2,8 @@ package me.christine.housewifesolution;
 
 
 import android.app.Activity;
-import android.content.Context;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -11,7 +12,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.PopupMenu;
 import android.widget.TabHost;
@@ -20,16 +20,10 @@ import android.widget.TextView.OnEditorActionListener;
 import android.widget.Toast;
 import android.widget.ImageView;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.util.ArrayList;
-import java.io.File;
-import java.io.PrintWriter;
+import java.util.List;
+
+import me.christine.sqlite.DatabaseHandler.DatabaseHandler;
 
 public class MainActivity extends Activity {
 
@@ -41,9 +35,12 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         setupTabs();
-        itemAdapter = new ItemAdapter(this, arrayOfItems);
+        DatabaseHandler dh = new DatabaseHandler(this);
+        SQLiteDatabase db = dh.getWritableDatabase();
+        Cursor cursor = db.rawQuery("SELECT rowid _id,* FROM shoppinglist", null);
+        itemAdapter = new ItemAdapter(this, cursor);
         setItemAdapter(itemAdapter);
-        showShoppingList();
+        displayShoppingList();
     }
 
 
@@ -131,28 +128,6 @@ public class MainActivity extends Activity {
         tabHost.addTab(tab1);
         tabHost.addTab(tab2);
         tabHost.addTab(tab3);
-
-        /*ActionBar actionBar = getActionBar();
-        actionBar.setNavigationMode(actionBar.NAVIGATION_MODE_TABS);
-        actionBar.setDisplayShowTitleEnabled(true);
-        Tab tab1 = actionBar
-                .newTab()
-                .setText("Shopping")
-                .setTabListener(new FragmentTabListener<ShopFragment>(this, "shopping", ShopFragment.class));
-        actionBar.addTab(tab1);
-
-        Tab tab2 = actionBar
-                .newTab()
-                .setText("To_do")
-                .setTabListener(new FragmentTabListener<ToDoFragment>(this, "to_do", ToDoFragment.class));
-        actionBar.addTab(tab2);
-
-        Tab tab3 = actionBar
-                .newTab()
-                .setText("Recipe")
-                .setTabListener(new FragmentTabListener<RecipeFragment>(this, "recipe", RecipeFragment.class));
-        actionBar.addTab(tab3);*/
-
     }
 
     protected void setItemAdapter(final ItemAdapter itemAdapter) {
@@ -161,8 +136,8 @@ public class MainActivity extends Activity {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                ShoppingItem selectedItem = itemAdapter.getItem(position);
-                Toast.makeText(getApplicationContext(), selectedItem.getName(), Toast.LENGTH_SHORT).show();
+                Cursor cursor = (Cursor) listView.getItemAtPosition(position);
+                Toast.makeText(getApplicationContext(), cursor.getString(cursor.getColumnIndexOrThrow("name")), Toast.LENGTH_SHORT).show();
                 itemAdapter.notifyDataSetChanged();
             }
         });
@@ -178,9 +153,9 @@ public class MainActivity extends Activity {
                     if (str.length() > 0) {
                         editText.selectAll();
                         ShoppingItem newItem = new ShoppingItem(str);
-                        arrayOfItems.add(newItem);
-                        itemAdapter.notifyDataSetChanged();
-                        writeToFile(str);
+                        DatabaseHandler dh = new DatabaseHandler(getBaseContext());
+                        dh.addShoppingItem(newItem);
+                        refreshListView(dh);
                     }
                     return true;
                 }
@@ -192,74 +167,29 @@ public class MainActivity extends Activity {
             @Override
             public void onClick(View v) {
                 editText.setText("");
-                /*String str = editText.getText().toString();
-                if (str.length() > 0) {
-                    editText.selectAll();
-                    ShoppingItem newItem = new ShoppingItem(str);
-                    arrayOfItems.add(newItem);
-                    itemAdapter.notifyDataSetChanged();
-                    writeToFile(str);
-                }*/
             }
         });
     }
 
-    protected void writeToFile(String str) {
-        try {
-            FileOutputStream fos = openFileOutput("shopping_list", Context.MODE_APPEND|Context.MODE_WORLD_READABLE);
-            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(fos));
-            writer.write(str);
-            writer.newLine();
-            writer.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    protected void showShoppingList() {
-        try {
-            BufferedReader inputReader = new BufferedReader(new InputStreamReader(
-                    openFileInput("shopping_list")));
-            String inputString;
-            StringBuffer stringBuffer = new StringBuffer();
-            while ((inputString = inputReader.readLine()) != null) {
-                stringBuffer.append(inputString + "\n");
-                ShoppingItem item = new ShoppingItem(inputString);
-                arrayOfItems.add(item);
-                itemAdapter.notifyDataSetChanged();
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void deleteShoppingItem(View v, ImageView imageView) {
-        final ListView listView = (ListView) findViewById(R.id.shopping_list);
-        int position = listView.getPositionForView(v);
-        deleteItemFromStorage(position);
-        //delete from the listview
-        listView.removeViewInLayout(v);
+    protected void refreshListView(DatabaseHandler dh) {
+        SQLiteDatabase db = dh.getWritableDatabase();
+        Cursor newCursor = db.rawQuery("SELECT rowid _id,* FROM shoppinglist", null);
+        itemAdapter.changeCursor(newCursor);
         itemAdapter.notifyDataSetChanged();
     }
 
-    public void deleteItemFromStorage(int position) {
-        arrayOfItems.remove(position);
-        updateFile(arrayOfItems);
+    protected void displayShoppingList() {
+        DatabaseHandler dh = new DatabaseHandler(getBaseContext());
+        List<ShoppingItem> shoppingItems = dh.getShoppingList();
+        for (ShoppingItem shoppingItem : shoppingItems) {
+            arrayOfItems.add(shoppingItem);
+            itemAdapter.notifyDataSetChanged();
+        }
     }
 
-    public void updateFile(ArrayList<ShoppingItem> arrayOfItems) {
-        try {
-            FileOutputStream fos = openFileOutput("shopping_list", Context.MODE_PRIVATE);
-            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(fos));
-            writer.write("");
-            writer.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-       for (int i = 0; i < arrayOfItems.size(); i++) {
-            ShoppingItem shoppingItem = arrayOfItems.get(i);
-            String itemName = shoppingItem.getName();
-            writeToFile(itemName);
-        }
+    public void deleteShoppingItem(View v, ShoppingItem shoppingItem) {
+        DatabaseHandler dh = new DatabaseHandler(getBaseContext());
+        dh.deleteShoppingItem(shoppingItem);
+        refreshListView(dh);
     }
 }

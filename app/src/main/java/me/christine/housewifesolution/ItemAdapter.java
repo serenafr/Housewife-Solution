@@ -2,48 +2,41 @@ package me.christine.housewifesolution;
 
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
+import android.widget.CursorAdapter;
 import android.content.Context;
-import java.util.ArrayList;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.database.Cursor;
 
 /**
  * Created by christine on 15-5-12.
  */
-public class ItemAdapter extends ArrayAdapter<ShoppingItem> {
-    private static class ViewHolder {
-        TextView name;
-        ImageView imageView;
+public class ItemAdapter extends CursorAdapter {
+
+    public ItemAdapter(Context context, Cursor cursor) {
+        super(context, cursor, 0);
     }
 
-    public ItemAdapter(Context context, ArrayList<ShoppingItem> shoppingItems) {
-        super(context, R.layout.shopping_item_layout, shoppingItems);
+    public View newView(Context context, Cursor cursor, ViewGroup parent) {
+        return LayoutInflater.from(context).inflate(R.layout.shopping_item_layout, parent, false);
     }
 
-    public View getView(int position, View convertView, ViewGroup parent) {
-        ShoppingItem shoppingItem = getItem(position);
-        final ViewHolder viewHolder;
-
-        if (convertView == null) {
-            viewHolder = new ViewHolder();
-            LayoutInflater inflater = LayoutInflater.from(getContext());
-            convertView = inflater.inflate(R.layout.shopping_item_layout, parent, false);
-            viewHolder.name = (TextView) convertView.findViewById(R.id.itemName);
-            viewHolder.imageView = (ImageView) convertView.findViewById(R.id.deleteItem);
-            convertView.setTag(viewHolder);
-        } else {
-            viewHolder = (ViewHolder) convertView.getTag();
-        }
-        viewHolder.name.setText(shoppingItem.getName());
-        viewHolder.imageView.setOnClickListener(new View.OnClickListener() {
+    public void bindView(View view, Context context, Cursor cursor) {
+        TextView tvName = (TextView) view.findViewById(R.id.itemName);
+        String name = cursor.getString(cursor.getColumnIndexOrThrow("name"));
+        tvName.setText(name);
+        final String itemIdString = cursor.getString(cursor.getColumnIndexOrThrow("_id"));
+        final int itemId = Integer.parseInt(itemIdString);
+        final String itemName = cursor.getString(cursor.getColumnIndexOrThrow("name"));
+        final ShoppingItem shoppingItem = new ShoppingItem(itemId, itemName);
+        final ImageView imageView = (ImageView) view.findViewById(R.id.delete_item);
+        imageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 MainActivity mainActivity = (MainActivity) v.getContext();
-                mainActivity.deleteShoppingItem(v, viewHolder.imageView);
+                mainActivity.deleteShoppingItem(v, shoppingItem);
             }
         });
-        return convertView;
     }
 }

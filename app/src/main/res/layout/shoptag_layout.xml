@@ -30,7 +30,8 @@
             android:layout_centerVertical="true"
             android:layout_alignTop="@id/add_shopping_items"
             android:layout_alignBottom="@id/add_shopping_items"
-            android:background="@drawable/add_shopping_item_background"/>
+            android:background="@drawable/add_shopping_item_background"
+            android:onClick="deleteShoppingItem"/>
     </RelativeLayout>
 
     <ListView

@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.ImageButton;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ListView;
 
 /**
@@ -15,7 +16,7 @@ import android.widget.ListView;
  */
 public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActivity>{
     private MainActivity mainActivity;
-    private ImageButton imageButton;
+    private ImageView imageView;
     private EditText editText;
     private ListView listView;
 
@@ -29,14 +30,14 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActiv
         setActivityInitialTouchMode(true);
 
         mainActivity = getActivity();
-        imageButton = (ImageButton) mainActivity.findViewById(R.id.add_shopping_cart);
+        imageView = (ImageView) mainActivity.findViewById(R.id.delete_input_text);
         editText = (EditText) mainActivity.findViewById(R.id.add_shopping_items);
         listView = (ListView) mainActivity.findViewById(R.id.shopping_list);
     }
 
     public void testPreconditions() {
         assertNotNull("MainActivity is null", mainActivity);
-        assertNotNull("ImageButton is null", imageButton);
+        assertNotNull("ImageButton is null", imageView);
         assertNotNull("EditText is null", editText);
         assertNotNull("ListView is null", listView);
     }
@@ -44,8 +45,8 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActiv
     //Verify that button is displayed correctly.
     public void testImageButton_layout() {
         final View decorView = mainActivity.getWindow().getDecorView();
-        ViewAsserts.assertOnScreen(decorView, imageButton);
-        final ViewGroup.LayoutParams layoutParams = imageButton.getLayoutParams();
+        ViewAsserts.assertOnScreen(decorView, imageView);
+        final ViewGroup.LayoutParams layoutParams = imageView.getLayoutParams();
         assertNotNull(layoutParams);
         assertEquals(layoutParams.width, WindowManager.LayoutParams.WRAP_CONTENT);
         assertEquals(layoutParams.height, WindowManager.LayoutParams.WRAP_CONTENT);

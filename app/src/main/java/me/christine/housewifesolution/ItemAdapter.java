@@ -10,25 +10,80 @@ import android.widget.TextView;
 import android.database.Cursor;
 import android.util.Log;
 
+import java.util.zip.Inflater;
+
 /**
  * Created by christine on 15-5-12.
+ * Reference: http://kmansoft.com/2010/11/16/adding-group-headers-to-listview/
  */
 public class ItemAdapter extends CursorAdapter {
+    private static final int VIEW_TYPE_WITH_HEADER = 0;
+    private static final int VIEW_TYPE_ITEM = 1;
+    private static final int VIEW_TYPE_COUNT = 2;
 
     public ItemAdapter(Context context, Cursor cursor) {
         super(context, cursor, 0);
+        LayoutInflater inflater = LayoutInflater.from(context);
     }
 
+    @Override
+    public int getViewTypeCount() {
+        return VIEW_TYPE_COUNT;
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        Cursor cursor = getCursor();
+        cursor.moveToPosition(position);
+        boolean newGroup = isNewGroup(cursor, position);
+        if(newGroup) {
+            return VIEW_TYPE_WITH_HEADER;
+        } else {
+            return VIEW_TYPE_ITEM;
+        }
+    }
+
+    @Override
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
-        return LayoutInflater.from(context).inflate(R.layout.shopping_item_layout, parent, false);
+        int position = cursor.getPosition();
+        int nViewType;
+        boolean newGroup = isNewGroup(cursor, position);
+        if(newGroup) {
+            nViewType = VIEW_TYPE_WITH_HEADER;
+        } else {
+            nViewType = VIEW_TYPE_ITEM;
+        }
+        View v;
+        if(nViewType == VIEW_TYPE_WITH_HEADER) {
+            v = LayoutInflater.from(context).inflate(R.layout.store_separator, parent, false);
+            View header = v.findViewById(R.id.store_separator);
+            header.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+
+                }
+            });
+        } else {
+            v = LayoutInflater.from(context).inflate(R.layout.shopping_item_layout, parent, false);
+        }
+        return v;
     }
 
+    @Override
     public void bindView(View view, Context context, Cursor cursor) {
-        TextView tvName = (TextView) view.findViewById(R.id.itemName);
+        TextView tv;
+        tv = (TextView) view.findViewById(R.id.itemName);
         String name = cursor.getString(cursor.getColumnIndexOrThrow("name"));
         String store = cursor.getString(cursor.getColumnIndexOrThrow("store"));
-        String nameStore = name + " " + store;
-        tvName.setText(nameStore);
+        if (store == null) {
+            store = "";
+        }
+        tv.setText(name);
+        tv = (TextView) view.findViewById(R.id.store_separator);
+        if(tv != null) {
+            tv.setText(store);
+        }
+        //set onclicklistener for imageview delete_item
         final String itemIdString = cursor.getString(cursor.getColumnIndexOrThrow("_id"));
         final int itemId = Integer.parseInt(itemIdString);
         final String itemName = cursor.getString(cursor.getColumnIndexOrThrow("name"));
@@ -42,5 +97,30 @@ public class ItemAdapter extends CursorAdapter {
                 mainActivity.deleteShoppingItem(v, shoppingItem);
             }
         });
+    }
+
+    private boolean isNewGroup(Cursor cursor, int position) {
+        if ( position == 0) {
+            String store = cursor.getString(cursor.getColumnIndexOrThrow("store"));
+            if (store == null) {
+                return false;
+            } else {
+                return true;
+            }
+        } else {
+            String store_now = cursor.getString(cursor.getColumnIndexOrThrow("store"));
+            cursor.moveToPosition(position - 1);
+            String store_pre = cursor.getString(cursor.getColumnIndexOrThrow("store"));
+            cursor.moveToPosition(position);
+            if (store_now == null && store_pre == null) {
+                return false;
+            } else if (store_pre == null || store_now == null) {
+                return true;
+            } else if (store_pre.equals(store_now)){
+                return false;
+            } else {
+                return true;
+            }
+        }
     }
 }

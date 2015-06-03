@@ -95,6 +95,7 @@ public class AddStoreActivity extends Activity {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                addStoreInfo(v);
                 Intent receivedIntent = getIntent();
                 Intent resultIntent = new Intent();
                 resultIntent.putExtra(MainActivity.ITEM_ID, receivedIntent.getStringExtra(MainActivity.ITEM_ID));

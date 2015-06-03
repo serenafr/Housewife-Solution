@@ -21,7 +21,6 @@ import android.widget.TextView.OnEditorActionListener;
 import android.widget.Toast;
 import android.widget.ImageView;
 import android.util.Log;
-import android.net.Uri;
 
 import java.util.List;
 
@@ -41,7 +40,7 @@ public class MainActivity extends Activity {
         setupTabs();
         DatabaseHandler dh = new DatabaseHandler(this);
         SQLiteDatabase db = dh.getWritableDatabase();
-        Cursor cursor = db.rawQuery("SELECT rowid _id,* FROM shoppinglist", null);
+        Cursor cursor = db.rawQuery("SELECT rowid _id,* FROM shoppinglist ORDER BY store", null);
         itemAdapter = new ItemAdapter(this, cursor);
         setItemAdapter(itemAdapter);
         final ListView listView = (ListView) findViewById(R.id.shopping_list);
@@ -171,7 +170,7 @@ public class MainActivity extends Activity {
 
     protected void refreshListView(DatabaseHandler dh) {
         SQLiteDatabase db = dh.getWritableDatabase();
-        Cursor newCursor = db.rawQuery("SELECT rowid _id,* FROM shoppinglist", null);
+        Cursor newCursor = db.rawQuery("SELECT rowid _id,* FROM shoppinglist ORDER BY store", null);
         itemAdapter.changeCursor(newCursor);
         itemAdapter.notifyDataSetChanged();
     }

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <TextView
+        android:id="@+id/store_separator"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:textSize="15dp"
+        android:background="@color/store_separator_background"/>
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/itemName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="ItemName"
+            android:layout_margin="10dp"
+            android:padding="2dp"
+            android:textColor="@drawable/shopping_item_text_selector"
+            android:textSize="20dp"/>
+        <ImageView
+            android:id="@+id/delete_item"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_alignTop="@id/itemName"
+            android:layout_alignBottom="@id/itemName"
+            android:src="@drawable/ic_action_discard"
+            android:onClick="deleteShoppingItem"/>
+    </RelativeLayout>
+</LinearLayout>

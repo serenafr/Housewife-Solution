@@ -2,6 +2,7 @@ package me.christine.housewifesolution;
 
 
 import android.app.Activity;
+import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
@@ -19,16 +20,19 @@ import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
 import android.widget.Toast;
 import android.widget.ImageView;
+import android.util.Log;
+import android.net.Uri;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import me.christine.sqlite.DatabaseHandler.DatabaseHandler;
 
 public class MainActivity extends Activity {
 
-    public ArrayList<ShoppingItem> arrayOfItems = new ArrayList<ShoppingItem>();
     public ItemAdapter itemAdapter;
+    private final int GET_STORE_NAME_REQUEST = 1;
+    public static final String STORE_NAME = "Store Name";
+    public static final String ITEM_ID = "ItemId";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,6 +44,8 @@ public class MainActivity extends Activity {
         Cursor cursor = db.rawQuery("SELECT rowid _id,* FROM shoppinglist", null);
         itemAdapter = new ItemAdapter(this, cursor);
         setItemAdapter(itemAdapter);
+        final ListView listView = (ListView) findViewById(R.id.shopping_list);
+        setOnItemClickListenerForListView(listView);
         displayShoppingList();
     }
 
@@ -133,14 +139,6 @@ public class MainActivity extends Activity {
     protected void setItemAdapter(final ItemAdapter itemAdapter) {
         final ListView listView = (ListView) findViewById(R.id.shopping_list);
         listView.setAdapter(itemAdapter);
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Cursor cursor = (Cursor) listView.getItemAtPosition(position);
-                Toast.makeText(getApplicationContext(), cursor.getString(cursor.getColumnIndexOrThrow("name")), Toast.LENGTH_SHORT).show();
-                itemAdapter.notifyDataSetChanged();
-            }
-        });
     }
 
     public void addShoppingItems(View v) {
@@ -182,7 +180,6 @@ public class MainActivity extends Activity {
         DatabaseHandler dh = new DatabaseHandler(getBaseContext());
         List<ShoppingItem> shoppingItems = dh.getShoppingList();
         for (ShoppingItem shoppingItem : shoppingItems) {
-            arrayOfItems.add(shoppingItem);
             itemAdapter.notifyDataSetChanged();
         }
     }
@@ -192,4 +189,45 @@ public class MainActivity extends Activity {
         dh.deleteShoppingItem(shoppingItem);
         refreshListView(dh);
     }
+
+    public void setOnItemClickListenerForListView(final ListView listView) {
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, final View view, int position, long id) {
+                Cursor cursor = (Cursor) listView.getItemAtPosition(position);
+                final String itemId = cursor.getString(cursor.getColumnIndexOrThrow("_id"));
+                PopupMenu popup;
+                popup = new PopupMenu(MainActivity.this, view);
+                MenuInflater inflater = popup.getMenuInflater();
+                inflater.inflate(R.menu.add_store_menu, popup.getMenu());
+                popup.show();
+                popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem item) {
+                        Intent intent = new Intent(MainActivity.this, AddStoreActivity.class);
+                        intent.putExtra(ITEM_ID, itemId);
+                        startActivityForResult(intent, GET_STORE_NAME_REQUEST);
+                        return true;
+                    }
+                });
+            }
+        });
+    }
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == GET_STORE_NAME_REQUEST && resultCode == RESULT_OK && data != null) {
+            Bundle receivedInfo = data.getExtras();
+            int receivedId = Integer.parseInt(receivedInfo.getString(ITEM_ID));
+            String receivedStoreName = receivedInfo.getString(STORE_NAME);
+            DatabaseHandler dh = new DatabaseHandler(getBaseContext());
+            if (receivedStoreName != "") {
+                ShoppingItem shoppingItem = dh.getShoppingItem(receivedId);
+                String itemName = shoppingItem.getName();
+                shoppingItem = new ShoppingItem(receivedId, itemName, receivedStoreName);
+                dh.updateShoppingItem(shoppingItem);
+                refreshListView(dh);
+            }
+        }
+    }
 }
+

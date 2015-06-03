@@ -5,11 +5,8 @@
       <module fileurl="file://$PROJECT_DIR$/HousewifeSolution.iml" filepath="$PROJECT_DIR$/HousewifeSolution.iml" />
       <module fileurl="file://$PROJECT_DIR$/actionbarsherlock/actionbarsherlock.iml" filepath="$PROJECT_DIR$/actionbarsherlock/actionbarsherlock.iml" />
       <module fileurl="file://$PROJECT_DIR$/actionbarsherlock-fest/actionbarsherlock-fest.iml" filepath="$PROJECT_DIR$/actionbarsherlock-fest/actionbarsherlock-fest.iml" />
-      <module fileurl="file://$PROJECT_DIR$/actionbarsherlock-fest/actionbarsherlock-fest.iml" filepath="$PROJECT_DIR$/actionbarsherlock-fest/actionbarsherlock-fest.iml" />
-      <module fileurl="file://$PROJECT_DIR$/actionbarsherlock-i18n/actionbarsherlock-i18n.iml" filepath="$PROJECT_DIR$/actionbarsherlock-i18n/actionbarsherlock-i18n.iml" />
       <module fileurl="file://$PROJECT_DIR$/actionbarsherlock-i18n/actionbarsherlock-i18n.iml" filepath="$PROJECT_DIR$/actionbarsherlock-i18n/actionbarsherlock-i18n.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
     </modules>
   </component>
 </project>
-

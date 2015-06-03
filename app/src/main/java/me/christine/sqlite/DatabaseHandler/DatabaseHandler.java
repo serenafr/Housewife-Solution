@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.database.Cursor;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,6 +22,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
     private static final String KEY_ID = "id";
     private static final String KEY_NAME = "name";
+    private static final String KEY_STORE = "store";
 
     public DatabaseHandler(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -28,13 +30,16 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
     public void onCreate(SQLiteDatabase db) {
         String CREATE_SHOPPINGLIST_TABLE = "CREATE TABLE " + TABLE_SHOPPING_LIST + "("
-                + KEY_ID + " INTEGER PRIMARY KEY," + KEY_NAME + " TEXT" + ")";
+                + KEY_ID + " INTEGER PRIMARY KEY," + KEY_NAME + " TEXT," + KEY_STORE + " TEXT" + ")";
         db.execSQL(CREATE_SHOPPINGLIST_TABLE);
     }
 
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         db.execSQL("CREATE_TABLE_IF_EXISTS " + TABLE_SHOPPING_LIST);
         onCreate(db);
+        if(newVersion > oldVersion) {
+            db.execSQL("ALTER TABLE TABLE_SHOPPING_LIST ADD COLUMN KEY_STORE TEXT DEFAULT NULL");
+        }
     }
 
     public void addShoppingItem(ShoppingItem shoppingItem) {
@@ -47,12 +52,13 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
     public ShoppingItem getShoppingItem(int id) {
         SQLiteDatabase db = this.getReadableDatabase();
-        Cursor cursor = db.query(TABLE_SHOPPING_LIST, new String[] {KEY_ID, KEY_NAME},
+        Cursor cursor = db.query(TABLE_SHOPPING_LIST, new String[] {KEY_ID, KEY_NAME, KEY_STORE},
                 KEY_ID + "=?", new String[] {String.valueOf(id)}, null, null, null, null);
         if (cursor != null) {
             cursor.moveToFirst();
         }
-        ShoppingItem shoppingItem = new ShoppingItem(Integer.parseInt(cursor.getString(0)), cursor.getString(1));
+        ShoppingItem shoppingItem = new ShoppingItem(Integer.parseInt(cursor.getString(0)),
+                cursor.getString(1), cursor.getString(2));
         return shoppingItem;
     }
 
@@ -66,6 +72,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 ShoppingItem shoppingItem = new ShoppingItem();
                 shoppingItem.setId(Integer.parseInt(cursor.getString(0)));
                 shoppingItem.setName(cursor.getString(1));
+                shoppingItem.setStore(cursor.getString(2));
                 shoppingList.add(shoppingItem);
             } while (cursor.moveToNext());
         }
@@ -85,6 +92,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put(KEY_NAME, shoppingItem.getName());
+        values.put(KEY_STORE, shoppingItem.getStore());
         return db.update(TABLE_SHOPPING_LIST, values, KEY_ID + " = ? ",
                 new String[] { String.valueOf(shoppingItem.getId()) });
     }
@@ -94,5 +102,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         db.delete(TABLE_SHOPPING_LIST, KEY_ID + " = ? ",
                 new String[] { String.valueOf(shoppingItem.getId()) });
         db.close();
+    }
+
+    public void dropTable(SQLiteDatabase db) {
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_SHOPPING_LIST);
     }
 }

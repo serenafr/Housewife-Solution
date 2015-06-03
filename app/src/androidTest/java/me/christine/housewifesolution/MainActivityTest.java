@@ -10,6 +10,7 @@ import android.widget.ImageButton;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.content.Intent;
 
 /**
  * Created by christine on 15-5-18.

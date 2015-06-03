@@ -8,6 +8,7 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.database.Cursor;
+import android.util.Log;
 
 /**
  * Created by christine on 15-5-12.
@@ -25,11 +26,14 @@ public class ItemAdapter extends CursorAdapter {
     public void bindView(View view, Context context, Cursor cursor) {
         TextView tvName = (TextView) view.findViewById(R.id.itemName);
         String name = cursor.getString(cursor.getColumnIndexOrThrow("name"));
-        tvName.setText(name);
+        String store = cursor.getString(cursor.getColumnIndexOrThrow("store"));
+        String nameStore = name + " " + store;
+        tvName.setText(nameStore);
         final String itemIdString = cursor.getString(cursor.getColumnIndexOrThrow("_id"));
         final int itemId = Integer.parseInt(itemIdString);
         final String itemName = cursor.getString(cursor.getColumnIndexOrThrow("name"));
-        final ShoppingItem shoppingItem = new ShoppingItem(itemId, itemName);
+        final String itemStore = cursor.getString(cursor.getColumnIndexOrThrow("store"));
+        final ShoppingItem shoppingItem = new ShoppingItem(itemId, itemName, itemStore);
         final ImageView imageView = (ImageView) view.findViewById(R.id.delete_item);
         imageView.setOnClickListener(new View.OnClickListener() {
             @Override

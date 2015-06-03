@@ -8,4 +8,7 @@
     <string name="add_items_to_buy">Add Items to Buy</string>
     <string name="name_item_to_buy">Item</string>
     <string name="quantity_item_to_buy">Quantity</string>
+    <string name="title_activity_add_store">AddStoreActivity</string>
+    <string name="add_a_store_name">Where you want to buy this?</string>
+    <string name="hello_world">Hello world!</string>
 </resources>

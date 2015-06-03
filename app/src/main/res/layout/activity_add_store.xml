@@ -1,0 +1,51 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:orientation="vertical"
+    tools:context="me.christine.housewifesolution.AddStoreActivity">
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <EditText
+            android:id="@+id/add_a_store_name"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/add_a_store_name"
+            android:padding="6dp"
+            android:textSize="20dp"
+            android:background="@drawable/add_shopping_item_background"
+            android:layout_centerVertical="true"
+            android:singleLine="true"
+            android:onClick="addStoreInfo"/>
+
+        <ImageView
+            android:id="@+id/delete_input_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_action_remove"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_alignTop="@id/add_a_store_name"
+            android:layout_alignBottom="@id/add_a_store_name"
+            android:background="@drawable/add_shopping_item_background"/>
+    </RelativeLayout>
+
+    <ListView
+        android:id="@+id/edit_store"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content">
+    </ListView>
+
+    <Button
+        android:id="@+id/save_store_button"
+        android:text="Save"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+</LinearLayout>

@@ -8,9 +8,6 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.database.Cursor;
-import android.util.Log;
-
-import java.util.zip.Inflater;
 
 /**
  * Created by christine on 15-5-12.
@@ -23,7 +20,6 @@ public class ItemAdapter extends CursorAdapter {
 
     public ItemAdapter(Context context, Cursor cursor) {
         super(context, cursor, 0);
-        LayoutInflater inflater = LayoutInflater.from(context);
     }
 
     @Override

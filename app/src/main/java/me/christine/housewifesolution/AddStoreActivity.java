@@ -9,6 +9,7 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Button;
 import android.util.Log;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -32,6 +33,14 @@ public class AddStoreActivity extends Activity {
         setAdapter(itemInfoAdapter);
         Button saveButton = (Button) findViewById(R.id.save_store_button);
         setOnClickListenerForSaveButton(saveButton);
+        final ImageView imageView = (ImageView) findViewById(R.id.delete_input_text_store);
+        imageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                EditText editText = (EditText) findViewById(R.id.add_a_store_name);
+                editText.setText("");
+            }
+        });
     }
 
 

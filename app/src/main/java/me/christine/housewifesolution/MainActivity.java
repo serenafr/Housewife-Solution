@@ -6,16 +6,22 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.view.GestureDetector;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.MotionEvent;
+import android.view.View.OnClickListener;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.ListView;
 import android.widget.PopupMenu;
 import android.widget.TabHost;
+import android.widget.TabWidget;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
 import android.widget.Toast;
@@ -23,11 +29,13 @@ import android.widget.ImageView;
 import android.util.Log;
 
 import java.util.List;
+import java.util.logging.Filter;
 
 import me.christine.sqlite.DatabaseHandler.DatabaseHandler;
 
 public class MainActivity extends Activity {
-
+    private GestureDetector gestureDetector;
+    View.OnTouchListener gestureListener;
     public ItemAdapter itemAdapter;
     private final int GET_STORE_NAME_REQUEST = 1;
     public static final String STORE_NAME = "Store Name";
@@ -38,14 +46,50 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         setupTabs();
+        gestureDetector = new GestureDetector(this, new CustomGestureDetector());
+        gestureListener = new View.OnTouchListener() {
+            public boolean onTouch(View view, MotionEvent event) {
+                return gestureDetector.onTouchEvent(event);
+            }
+        };
+        //setting animation features for tabs, so that new tabs slide in when clicked
+        TabHost tabHost = (TabHost) findViewById(android.R.id.tabhost);
+        AnimatedTabHostListener animatedTabHostListener = new AnimatedTabHostListener(tabHost);
+        tabHost.setOnTabChangedListener(animatedTabHostListener);
+
+        //Shopping tab
         DatabaseHandler dh = new DatabaseHandler(this);
         SQLiteDatabase db = dh.getWritableDatabase();
         Cursor cursor = db.rawQuery("SELECT rowid _id,* FROM shoppinglist ORDER BY store", null);
         itemAdapter = new ItemAdapter(this, cursor);
-        setItemAdapter(itemAdapter);
         final ListView listView = (ListView) findViewById(R.id.shopping_list);
+        listView.setAdapter(itemAdapter);
         setOnItemClickListenerForListView(listView);
+        tabHost.setOnTouchListener(new OnSwipeTouchListener(getBaseContext()) {
+            public void onSwipeTop() {
+                Toast.makeText(MainActivity.this, "top", Toast.LENGTH_SHORT).show();
+            }
+
+            public void onSwipeRight() {
+                Toast.makeText(MainActivity.this, "right", Toast.LENGTH_SHORT).show();
+            }
+
+            public void onSwipeLeft() {
+                Toast.makeText(MainActivity.this, "left", Toast.LENGTH_SHORT).show();
+            }
+
+            public void onSwipeBottom() {
+                Toast.makeText(MainActivity.this, "bottom", Toast.LENGTH_SHORT).show();
+            }
+
+
+            public boolean onTouch(View v, MotionEvent event) {
+                return gestureDetector.onTouchEvent(event);
+            }
+        });
         displayShoppingList();
+
+        //cards tab
     }
 
 
@@ -135,10 +179,7 @@ public class MainActivity extends Activity {
         tabHost.addTab(tab3);
     }
 
-    protected void setItemAdapter(final ItemAdapter itemAdapter) {
-        final ListView listView = (ListView) findViewById(R.id.shopping_list);
-        listView.setAdapter(itemAdapter);
-    }
+    /* The following codes are for operations in tab shopping*/
 
     public void addShoppingItems(View v) {
         final EditText editText = (EditText) findViewById(R.id.add_shopping_items);
@@ -212,6 +253,7 @@ public class MainActivity extends Activity {
             }
         });
     }
+
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == GET_STORE_NAME_REQUEST && resultCode == RESULT_OK && data != null) {

@@ -26,7 +26,7 @@
             android:onClick="addStoreInfo"/>
 
         <ImageView
-            android:id="@+id/delete_input_text"
+            android:id="@+id/delete_input_text_store"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/ic_action_remove"

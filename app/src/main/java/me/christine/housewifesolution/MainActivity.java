@@ -13,23 +13,18 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.MotionEvent;
-import android.view.View.OnClickListener;
-import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.EditText;
-import android.widget.FrameLayout;
+import android.widget.GridView;
 import android.widget.ListView;
 import android.widget.PopupMenu;
 import android.widget.TabHost;
-import android.widget.TabWidget;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
 import android.widget.Toast;
 import android.widget.ImageView;
-import android.util.Log;
 
 import java.util.List;
-import java.util.logging.Filter;
 
 import me.christine.sqlite.DatabaseHandler.DatabaseHandler;
 
@@ -54,6 +49,9 @@ public class MainActivity extends Activity {
         };
         //setting animation features for tabs, so that new tabs slide in when clicked
         TabHost tabHost = (TabHost) findViewById(android.R.id.tabhost);
+        if(savedInstanceState != null) {
+            tabHost.setCurrentTab(savedInstanceState.getInt("CurrentTab"));
+        }
         AnimatedTabHostListener animatedTabHostListener = new AnimatedTabHostListener(tabHost);
         tabHost.setOnTabChangedListener(animatedTabHostListener);
 
@@ -90,8 +88,16 @@ public class MainActivity extends Activity {
         displayShoppingList();
 
         //cards tab
+        GridView gridView = (GridView) findViewById(R.id.cards_grid_view);
+        gridView.setAdapter(new CardsAdapter(this));
     }
 
+    //Save current tab, so app won't return to default tab when mobile is rotated
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        TabHost tabHost = (TabHost) findViewById(android.R.id.tabhost);
+        outState.putInt("CurrentTab", tabHost.getCurrentTab());
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="store_separator_background">#B6B6B6</color>
+    <color name="grid_view_background">#FFFFFF</color>
 </resources>

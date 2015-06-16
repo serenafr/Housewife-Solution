@@ -8,11 +8,19 @@
     <GridView
         android:id="@+id/cards_grid_view"
         android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
+        android:layout_height="wrap_content"
         android:numColumns="2"
         android:verticalSpacing="10dp"
         android:horizontalSpacing="10dp"
         android:stretchMode="columnWidth">
     </GridView>
 
+    <ImageView
+        android:id="@+id/add_new_card"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/ic_action_new_dark"
+        android:layout_margin="10dp"
+        android:onClick="startAddBarcodeActivity"
+        />
 </LinearLayout>

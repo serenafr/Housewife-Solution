@@ -33,6 +33,7 @@ public class MainActivity extends Activity {
     View.OnTouchListener gestureListener;
     public ItemAdapter itemAdapter;
     private final int GET_STORE_NAME_REQUEST = 1;
+    private final int ADD_STORE_AND_BARCODE = 2;
     public static final String STORE_NAME = "Store Name";
     public static final String ITEM_ID = "ItemId";
 
@@ -41,12 +42,6 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         setupTabs();
-        gestureDetector = new GestureDetector(this, new CustomGestureDetector());
-        gestureListener = new View.OnTouchListener() {
-            public boolean onTouch(View view, MotionEvent event) {
-                return gestureDetector.onTouchEvent(event);
-            }
-        };
         //setting animation features for tabs, so that new tabs slide in when clicked
         TabHost tabHost = (TabHost) findViewById(android.R.id.tabhost);
         if(savedInstanceState != null) {
@@ -54,15 +49,12 @@ public class MainActivity extends Activity {
         }
         AnimatedTabHostListener animatedTabHostListener = new AnimatedTabHostListener(tabHost);
         tabHost.setOnTabChangedListener(animatedTabHostListener);
-
-        //Shopping tab
-        DatabaseHandler dh = new DatabaseHandler(this);
-        SQLiteDatabase db = dh.getWritableDatabase();
-        Cursor cursor = db.rawQuery("SELECT rowid _id,* FROM shoppinglist ORDER BY store", null);
-        itemAdapter = new ItemAdapter(this, cursor);
-        final ListView listView = (ListView) findViewById(R.id.shopping_list);
-        listView.setAdapter(itemAdapter);
-        setOnItemClickListenerForListView(listView);
+        /*gestureDetector = new GestureDetector(this, new CustomGestureDetector());
+        gestureListener = new View.OnTouchListener() {
+            public boolean onTouch(View view, MotionEvent event) {
+                return gestureDetector.onTouchEvent(event);
+            }
+        };
         tabHost.setOnTouchListener(new OnSwipeTouchListener(getBaseContext()) {
             public void onSwipeTop() {
                 Toast.makeText(MainActivity.this, "top", Toast.LENGTH_SHORT).show();
@@ -84,15 +76,25 @@ public class MainActivity extends Activity {
             public boolean onTouch(View v, MotionEvent event) {
                 return gestureDetector.onTouchEvent(event);
             }
-        });
+        });*/
+
+        //Shopping tab
+        DatabaseHandler dh = new DatabaseHandler(this);
+        SQLiteDatabase db = dh.getWritableDatabase();
+        Cursor cursor = db.rawQuery("SELECT rowid _id,* FROM shoppinglist ORDER BY store_name", null);
+        itemAdapter = new ItemAdapter(this, cursor);
+        final ListView listView = (ListView) findViewById(R.id.shopping_list);
+        listView.setAdapter(itemAdapter);
+        setOnItemClickListenerForListView(listView);
         displayShoppingList();
 
         //cards tab
         GridView gridView = (GridView) findViewById(R.id.cards_grid_view);
-        gridView.setAdapter(new CardsAdapter(this));
+        Cursor cardCursor = db.rawQuery("SELECT rowid _id,* FROM membershipcard", null);
+        gridView.setAdapter(new CardsAdapter(this, cardCursor));
     }
 
-    //Save current tab, so app won't return to default tab when mobile is rotated
+    //Save current tab, so app won't return to default tab when mobile switches between portrait and landscape modes
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         TabHost tabHost = (TabHost) findViewById(android.R.id.tabhost);
@@ -185,7 +187,7 @@ public class MainActivity extends Activity {
         tabHost.addTab(tab3);
     }
 
-    /* The following codes are for operations in tab shopping*/
+    //******************* The following codes are for operations in tab shopping***********************//
 
     public void addShoppingItems(View v) {
         final EditText editText = (EditText) findViewById(R.id.add_shopping_items);
@@ -217,7 +219,7 @@ public class MainActivity extends Activity {
 
     protected void refreshListView(DatabaseHandler dh) {
         SQLiteDatabase db = dh.getWritableDatabase();
-        Cursor newCursor = db.rawQuery("SELECT rowid _id,* FROM shoppinglist ORDER BY store", null);
+        Cursor newCursor = db.rawQuery("SELECT rowid _id,* FROM shoppinglist ORDER BY store_name", null);
         itemAdapter.changeCursor(newCursor);
         itemAdapter.notifyDataSetChanged();
     }
@@ -275,6 +277,14 @@ public class MainActivity extends Activity {
                 refreshListView(dh);
             }
         }
+    }
+
+    //******************* The following codes are for operations in tab cards***********************//
+
+    public void startAddBarcodeActivity(View view) {
+
+        Intent intent = new Intent(MainActivity.this, AddBarcodeActivity.class);
+        startActivityForResult(intent, ADD_STORE_AND_BARCODE);
     }
 }
 

@@ -29,7 +29,8 @@
         <activity
             android:name=".AddBarcodeActivity"
             android:label="AddBarcodeActivity"
-            android:parentActivityName="me.christine.housewifesolution.MainActivity" >
+            android:parentActivityName="me.christine.housewifesolution.MainActivity"
+            android:configChanges="keyboardHidden|orientation">
             <!-- Parent activity meta-data to support 4.0 and lower -->
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"

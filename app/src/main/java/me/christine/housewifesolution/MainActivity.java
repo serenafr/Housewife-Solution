@@ -264,6 +264,7 @@ public class MainActivity extends Activity {
 
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+
         if (requestCode == GET_STORE_NAME_REQUEST && resultCode == RESULT_OK && data != null) {
             Bundle receivedInfo = data.getExtras();
             int receivedId = Integer.parseInt(receivedInfo.getString(ITEM_ID));

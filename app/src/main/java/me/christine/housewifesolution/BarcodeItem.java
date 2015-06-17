@@ -17,6 +17,11 @@ public class BarcodeItem {
         this._storeName = storeName;
     }
 
+    public BarcodeItem(String format, String content) {
+        this._barcodeContent = content;
+        this._barcodeFormat = format;
+    }
+
     public BarcodeItem(String storeName, String format, String content) {
         this._storeName = storeName;
         this._barcodeFormat = format;

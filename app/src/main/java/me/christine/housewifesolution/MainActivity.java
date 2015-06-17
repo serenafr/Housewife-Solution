@@ -92,6 +92,8 @@ public class MainActivity extends Activity {
         GridView gridView = (GridView) findViewById(R.id.cards_grid_view);
         Cursor cardCursor = db.rawQuery("SELECT rowid _id,* FROM membershipcard", null);
         gridView.setAdapter(new CardsAdapter(this, cardCursor));
+        setOnItemClickListenerForGridView(gridView);
+        setOnItemLongClickListenerForGridView(gridView);
     }
 
     //Save current tab, so app won't return to default tab when mobile switches between portrait and landscape modes
@@ -278,6 +280,16 @@ public class MainActivity extends Activity {
                 refreshListView(dh);
             }
         }
+
+        if (requestCode == ADD_STORE_AND_BARCODE && resultCode == RESULT_OK && data != null) {
+            Bundle receivedInfo = data.getExtras();
+            String receivedStoreName = receivedInfo.getString("Store Name");
+            String receivedBarcodeFormat = receivedInfo.getString("Barcode Format");
+            String receivedBarcodeContent = receivedInfo.getString("Barcode Content");
+            BarcodeItem barcodeItem = new BarcodeItem(receivedStoreName, receivedBarcodeFormat, receivedBarcodeContent);
+            DatabaseHandler dh = new DatabaseHandler(getBaseContext());
+            dh.createBarcodeItem(barcodeItem);
+        }
     }
 
     //******************* The following codes are for operations in tab cards***********************//
@@ -286,6 +298,27 @@ public class MainActivity extends Activity {
 
         Intent intent = new Intent(MainActivity.this, AddBarcodeActivity.class);
         startActivityForResult(intent, ADD_STORE_AND_BARCODE);
+    }
+
+    private void setOnItemClickListenerForGridView(final GridView gridView) {
+        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Cursor cursor = (Cursor) gridView.getItemAtPosition(position);
+                String storeName = cursor.getString(cursor.getColumnIndexOrThrow("store_name"));
+                String barcodeFormat = cursor.getString(cursor.getColumnIndexOrThrow("barcode_format"));
+                String barcodeContent = cursor.getString(cursor.getColumnIndexOrThrow("barcode_content"));
+                Intent intent = new Intent(MainActivity.this, AddBarcodeActivity.class);
+                intent.putExtra("Store Name", storeName);
+                intent.putExtra("Barcode Format", barcodeFormat);
+                intent.putExtra("Barcode Content", barcodeContent);
+                startActivityForResult(intent, ADD_STORE_AND_BARCODE);
+            }
+        });
+    }
+
+    private void setOnItemLongClickListenerForGridView(GridView gridView) {
+
     }
 }
 

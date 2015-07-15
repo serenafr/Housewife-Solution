@@ -6,92 +6,66 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
-import android.view.GestureDetector;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.MotionEvent;
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.GridView;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.PopupMenu;
 import android.widget.TabHost;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
 import android.widget.Toast;
-import android.widget.ImageView;
-
-import java.util.List;
+import android.util.Log;
 
 import me.christine.sqlite.DatabaseHandler.DatabaseHandler;
 
-public class MainActivity extends Activity {
-    private GestureDetector gestureDetector;
-    View.OnTouchListener gestureListener;
+public class MainActivity extends Activity{
     public ItemAdapter itemAdapter;
+    public CardsAdapter cardsAdapter;
     private final int GET_STORE_NAME_REQUEST = 1;
     private final int ADD_STORE_AND_BARCODE = 2;
+    private final int EIDT_STORE_OR_BARCODE = 3;
     public static final String STORE_NAME = "Store Name";
     public static final String ITEM_ID = "ItemId";
+    private Tabs tabs;
+    private DatabaseHandler dh = new DatabaseHandler(this);
+    private final ShoppingListOperations shoppingListOperations = new ShoppingListOperations(dh);;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        setupTabs();
-        //setting animation features for tabs, so that new tabs slide in when clicked
-        TabHost tabHost = (TabHost) findViewById(android.R.id.tabhost);
-        if(savedInstanceState != null) {
+        tabs = new Tabs();
+        tabs.setupTabs(getWindow().getDecorView());
+        if (savedInstanceState != null) {
+            TabHost tabHost = (TabHost) findViewById(android.R.id.tabhost);
             tabHost.setCurrentTab(savedInstanceState.getInt("CurrentTab"));
         }
-        AnimatedTabHostListener animatedTabHostListener = new AnimatedTabHostListener(tabHost);
-        tabHost.setOnTabChangedListener(animatedTabHostListener);
-        /*gestureDetector = new GestureDetector(this, new CustomGestureDetector());
-        gestureListener = new View.OnTouchListener() {
-            public boolean onTouch(View view, MotionEvent event) {
-                return gestureDetector.onTouchEvent(event);
-            }
-        };
-        tabHost.setOnTouchListener(new OnSwipeTouchListener(getBaseContext()) {
-            public void onSwipeTop() {
-                Toast.makeText(MainActivity.this, "top", Toast.LENGTH_SHORT).show();
-            }
-
-            public void onSwipeRight() {
-                Toast.makeText(MainActivity.this, "right", Toast.LENGTH_SHORT).show();
-            }
-
-            public void onSwipeLeft() {
-                Toast.makeText(MainActivity.this, "left", Toast.LENGTH_SHORT).show();
-            }
-
-            public void onSwipeBottom() {
-                Toast.makeText(MainActivity.this, "bottom", Toast.LENGTH_SHORT).show();
-            }
-
-
-            public boolean onTouch(View v, MotionEvent event) {
-                return gestureDetector.onTouchEvent(event);
-            }
-        });*/
 
         //Shopping tab
-        DatabaseHandler dh = new DatabaseHandler(this);
         SQLiteDatabase db = dh.getWritableDatabase();
         Cursor cursor = db.rawQuery("SELECT rowid _id,* FROM shoppinglist ORDER BY store_name", null);
         itemAdapter = new ItemAdapter(this, cursor);
         final ListView listView = (ListView) findViewById(R.id.shopping_list);
         listView.setAdapter(itemAdapter);
         setOnItemClickListenerForListView(listView);
-        displayShoppingList();
+        final EditText editTextItemInput = (EditText) findViewById(R.id.add_shopping_items);
+        setOnClickListenerforEditTextItemInput(editTextItemInput);
+        final ImageView imageViewDeleteItemInput = (ImageView) findViewById(R.id.delete_input_text);
+        setOnClickListenerforImageViewDeleteItemInput(imageViewDeleteItemInput);
+        //shoppingListOperations.displayShoppingList(getWindow().getDecorView(), itemAdapter);
 
         //cards tab
         GridView gridView = (GridView) findViewById(R.id.cards_grid_view);
         Cursor cardCursor = db.rawQuery("SELECT rowid _id,* FROM membershipcard", null);
-        gridView.setAdapter(new CardsAdapter(this, cardCursor));
+        cardsAdapter = new CardsAdapter(this, cardCursor);
+        gridView.setAdapter(cardsAdapter);
         setOnItemClickListenerForGridView(gridView);
         setOnItemLongClickListenerForGridView(gridView);
     }
@@ -162,90 +136,37 @@ public class MainActivity extends Activity {
         });
     }
 
-    private void setupTabs() {
-
-        TabHost tabHost = (TabHost) findViewById(android.R.id.tabhost);
-        tabHost.setup();
-
-        TabHost.TabSpec tab1, tab2, tab3;
-        tab1 = tabHost.
-                newTabSpec("First Tab").
-                setIndicator("Shopping").
-                setContent(R.id.shop_content_layout);
-
-
-        tab2 = tabHost.
-                newTabSpec("Second Tab").
-                setIndicator("Cards").
-                setContent(R.id.cards_content_layout);
-
-        tab3 = tabHost.
-                newTabSpec("Third Tab").
-                setIndicator("Recipe").
-                setContent(R.id.recipe_content_layout);
-
-        tabHost.addTab(tab1);
-        tabHost.addTab(tab2);
-        tabHost.addTab(tab3);
-    }
-
-    //******************* The following codes are for operations in tab shopping***********************//
-
-    public void addShoppingItems(View v) {
-        final EditText editText = (EditText) findViewById(R.id.add_shopping_items);
+    public void setOnClickListenerforEditTextItemInput(final EditText editText) {
         editText.setOnKeyListener(new View.OnKeyListener() {
             @Override
             public boolean onKey(View v, int keyCode, KeyEvent event) {
                 if (event != null && event.getAction() == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_ENTER) {
-                    String str = editText.getText().toString();
-                    if (str.length() > 0) {
-                        editText.selectAll();
-                        ShoppingItem newItem = new ShoppingItem(str);
-                        DatabaseHandler dh = new DatabaseHandler(getBaseContext());
-                        dh.addShoppingItem(newItem);
-                        refreshListView(dh);
-                    }
+                    String itemName = editText.getText().toString();
+                    shoppingListOperations.addShoppingItems(itemName);
+                    itemAdapter.changeCursor(shoppingListOperations.getNewCursor());
                     return true;
                 }
                 return false;
             }
         });
-        ImageView imageView = (ImageView) findViewById(R.id.delete_input_text);
+    }
+
+    public void setOnClickListenerforImageViewDeleteItemInput(final ImageView imageView) {
         imageView.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onClick(View view) {
+                EditText editText = (EditText) findViewById(R.id.add_shopping_items);
                 editText.setText("");
             }
         });
-    }
-
-    protected void refreshListView(DatabaseHandler dh) {
-        SQLiteDatabase db = dh.getWritableDatabase();
-        Cursor newCursor = db.rawQuery("SELECT rowid _id,* FROM shoppinglist ORDER BY store_name", null);
-        itemAdapter.changeCursor(newCursor);
-        itemAdapter.notifyDataSetChanged();
-    }
-
-    protected void displayShoppingList() {
-        DatabaseHandler dh = new DatabaseHandler(getBaseContext());
-        List<ShoppingItem> shoppingItems = dh.getShoppingList();
-        for (ShoppingItem shoppingItem : shoppingItems) {
-            itemAdapter.notifyDataSetChanged();
-        }
-    }
-
-    public void deleteShoppingItem(View v, ShoppingItem shoppingItem) {
-        DatabaseHandler dh = new DatabaseHandler(getBaseContext());
-        dh.deleteShoppingItem(shoppingItem);
-        refreshListView(dh);
     }
 
     public void setOnItemClickListenerForListView(final ListView listView) {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, final View view, int position, long id) {
-                Cursor cursor = (Cursor) listView.getItemAtPosition(position);
-                final String itemId = cursor.getString(cursor.getColumnIndexOrThrow("_id"));
+                final Cursor cursor = (Cursor) listView.getItemAtPosition(position);
+                final String itemId = cursor.getString(cursor.getColumnIndexOrThrow("item_id"));
                 PopupMenu popup;
                 popup = new PopupMenu(MainActivity.this, view);
                 MenuInflater inflater = popup.getMenuInflater();
@@ -271,13 +192,12 @@ public class MainActivity extends Activity {
             Bundle receivedInfo = data.getExtras();
             int receivedId = Integer.parseInt(receivedInfo.getString(ITEM_ID));
             String receivedStoreName = receivedInfo.getString(STORE_NAME);
-            DatabaseHandler dh = new DatabaseHandler(getBaseContext());
             if (receivedStoreName != "") {
                 ShoppingItem shoppingItem = dh.getShoppingItem(receivedId);
                 String itemName = shoppingItem.getName();
                 shoppingItem = new ShoppingItem(receivedId, itemName, receivedStoreName);
                 dh.updateShoppingItem(shoppingItem);
-                refreshListView(dh);
+                itemAdapter.changeCursor(shoppingListOperations.getNewCursor());
             }
         }
 
@@ -287,8 +207,19 @@ public class MainActivity extends Activity {
             String receivedBarcodeFormat = receivedInfo.getString("Barcode Format");
             String receivedBarcodeContent = receivedInfo.getString("Barcode Content");
             BarcodeItem barcodeItem = new BarcodeItem(receivedStoreName, receivedBarcodeFormat, receivedBarcodeContent);
-            DatabaseHandler dh = new DatabaseHandler(getBaseContext());
             dh.createBarcodeItem(barcodeItem);
+        }
+
+        if (requestCode == EIDT_STORE_OR_BARCODE && resultCode == RESULT_OK && data != null) {
+            Bundle receivedInfo = data.getExtras();
+            int receivedCardId = Integer.parseInt(receivedInfo.getString("Card Id"));
+            String receivedStoreName = receivedInfo.getString("Store Name");
+            String receivedBarcodeFormat = receivedInfo.getString("Barcode Format");
+            String receivedBarcodeContent = receivedInfo.getString("Barcode Content");
+            BarcodeItem barcodeItem = new BarcodeItem(receivedCardId, receivedStoreName, receivedBarcodeFormat, receivedBarcodeContent);
+            dh.updateMembershipCard(barcodeItem);
+            Log.d("received info", barcodeItem.toString());
+            refreshGridView(dh);
         }
     }
 
@@ -305,20 +236,37 @@ public class MainActivity extends Activity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Cursor cursor = (Cursor) gridView.getItemAtPosition(position);
+                String cardId = cursor.getString(0);
                 String storeName = cursor.getString(cursor.getColumnIndexOrThrow("store_name"));
                 String barcodeFormat = cursor.getString(cursor.getColumnIndexOrThrow("barcode_format"));
                 String barcodeContent = cursor.getString(cursor.getColumnIndexOrThrow("barcode_content"));
                 Intent intent = new Intent(MainActivity.this, AddBarcodeActivity.class);
+                intent.putExtra("Card Id", cardId);
                 intent.putExtra("Store Name", storeName);
                 intent.putExtra("Barcode Format", barcodeFormat);
                 intent.putExtra("Barcode Content", barcodeContent);
-                startActivityForResult(intent, ADD_STORE_AND_BARCODE);
+                startActivityForResult(intent, EIDT_STORE_OR_BARCODE);
             }
         });
     }
 
-    private void setOnItemLongClickListenerForGridView(GridView gridView) {
+    private void setOnItemLongClickListenerForGridView(final GridView gridView) {
+        /*gridView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                DatabaseHandler dh = new DatabaseHandler(getBaseContext());
+                Cursor cursor = (Cursor) gridView.getItemAtPosition(position);
+                dh.deleteBarcodeItem();
+                return false;
+            }
+        });*/
+    }
 
+    protected void refreshGridView(DatabaseHandler dh) {
+        SQLiteDatabase db = dh.getWritableDatabase();
+        Cursor newCursor = db.rawQuery("SELECT rowid _id,* FROM membershipcard", null);
+        cardsAdapter.changeCursor(newCursor);
+        cardsAdapter.notifyDataSetChanged();
     }
 }
 

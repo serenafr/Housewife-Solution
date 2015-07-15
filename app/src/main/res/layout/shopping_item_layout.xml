@@ -19,6 +19,5 @@
         android:layout_alignParentRight="true"
         android:layout_alignTop="@id/itemName"
         android:layout_alignBottom="@id/itemName"
-        android:src="@drawable/ic_action_discard"
-        android:onClick="deleteShoppingItem"/>
+        android:src="@drawable/ic_action_discard"/>
 </RelativeLayout>

@@ -37,9 +37,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
     public void onCreate(SQLiteDatabase db) {
         String CREATE_SHOPPINGLIST_TABLE = "CREATE TABLE " + TABLE_SHOPPING_LIST + "("
-                + SHOPPING_LIST_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," + SHOPPING_LIST_NAME + " TEXT," + STORE + " TEXT" + ")";
+                + SHOPPING_LIST_ID + " INTEGER PRIMARY KEY," + SHOPPING_LIST_NAME + " TEXT," + STORE + " TEXT" + ")";
         String CREATE_MEMBERSHIP_CARD_TABLE = "CREATE TABLE " + TABLE_MEMBERSHIP_CARD + "("
-                + CARD_ID + " INTEGER PRIMARY KEY," + STORE + " TEXT," + BARCODE_FORMAT + " TEXT," + BARCODE_CONTENT + " TEXT" + ")";
+                + CARD_ID + " LONG PRIMARY KEY," + STORE + " TEXT," + BARCODE_FORMAT + " TEXT," + BARCODE_CONTENT + " TEXT" + ")";
         db.execSQL(CREATE_SHOPPINGLIST_TABLE);
         db.execSQL(CREATE_MEMBERSHIP_CARD_TABLE);
     }
@@ -58,33 +58,38 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put(SHOPPING_LIST_NAME, shoppingItem.getName());
-        db.insert(TABLE_SHOPPING_LIST, null, values);
+        long itemId = db.insert(TABLE_SHOPPING_LIST, null, values);
+        shoppingItem.setId((int) itemId);
         db.close();
     }
 
     public ShoppingItem getShoppingItem(int id) {
         SQLiteDatabase db = this.getReadableDatabase();
+        ShoppingItem shoppingItem;
         Cursor cursor = db.query(TABLE_SHOPPING_LIST, new String[] {SHOPPING_LIST_ID, SHOPPING_LIST_NAME, STORE},
                 SHOPPING_LIST_ID + "=?", new String[] {String.valueOf(id)}, null, null, null, null);
-        if (cursor != null) {
-            cursor.moveToFirst();
+        if (cursor.moveToFirst()) {
+            shoppingItem = new ShoppingItem(
+                    cursor.getInt(cursor.getColumnIndexOrThrow(SHOPPING_LIST_ID)),
+                    cursor.getString(cursor.getColumnIndexOrThrow(SHOPPING_LIST_NAME)),
+                    cursor.getString(cursor.getColumnIndexOrThrow(STORE)));
+            return shoppingItem;
         }
-        ShoppingItem shoppingItem = new ShoppingItem(Integer.parseInt(cursor.getString(0)),
-                cursor.getString(1), cursor.getString(2));
-        return shoppingItem;
+        return null;
     }
 
     public List<ShoppingItem> getShoppingList() {
         List<ShoppingItem> shoppingList = new ArrayList<ShoppingItem>();
-        String selectQuery = "SELECT  * FROM " + TABLE_SHOPPING_LIST;
+        String selectQuery = "SELECT * FROM " + TABLE_SHOPPING_LIST;
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor cursor = db.rawQuery(selectQuery, null);
-        if(cursor.moveToFirst()) {
+        if(cursor.getCount() > 0) {
+            cursor.moveToFirst();
             do {
                 ShoppingItem shoppingItem = new ShoppingItem();
-                shoppingItem.setId(Integer.parseInt(cursor.getString(0)));
-                shoppingItem.setName(cursor.getString(1));
-                shoppingItem.setStore(cursor.getString(2));
+                shoppingItem.setId(cursor.getInt(cursor.getColumnIndexOrThrow(SHOPPING_LIST_ID)));
+                shoppingItem.setName(cursor.getString(cursor.getColumnIndexOrThrow(SHOPPING_LIST_NAME)));
+                shoppingItem.setStore(cursor.getString(cursor.getColumnIndexOrThrow(STORE)));
                 shoppingList.add(shoppingItem);
             } while (cursor.moveToNext());
         }
@@ -126,7 +131,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             values.put(BARCODE_FORMAT, barcodeItem.getBarcodeFormat());
             values.put(BARCODE_CONTENT, barcodeItem.getBarcodeContent());
         }
-        db.insert(TABLE_MEMBERSHIP_CARD, null, values);
+        long barcodeId = db.insert(TABLE_MEMBERSHIP_CARD, null, values);
+        barcodeItem.setId(barcodeId);
         db.close();
     }
 
@@ -139,7 +145,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             cursor.moveToFirst();
         }
         BarcodeItem barcodeItem = new BarcodeItem();
-        barcodeItem.setId(cursor.getInt(cursor.getColumnIndexOrThrow(CARD_ID)));
+        barcodeItem.setId(cursor.getColumnIndexOrThrow(CARD_ID));
         barcodeItem.setStoreName(cursor.getString(cursor.getColumnIndexOrThrow(STORE)));
         barcodeItem.addBarcode(cursor.getString(cursor.getColumnIndexOrThrow(BARCODE_FORMAT)),
                 cursor.getString(cursor.getColumnIndexOrThrow(BARCODE_CONTENT)));
@@ -154,7 +160,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         if (cursor.moveToFirst()) {
             do {
                 BarcodeItem barcodeItem = new BarcodeItem();
-                barcodeItem.setId(cursor.getInt(cursor.getColumnIndexOrThrow(CARD_ID)));
+                barcodeItem.setId(cursor.getColumnIndexOrThrow(CARD_ID));
                 barcodeItem.setStoreName(cursor.getString(cursor.getColumnIndexOrThrow(STORE)));
                 barcodeItem.addBarcode(cursor.getString(cursor.getColumnIndexOrThrow(BARCODE_FORMAT)),
                         cursor.getString(cursor.getColumnIndexOrThrow(BARCODE_CONTENT)));
@@ -164,7 +170,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         return cards;
     }
 
-    public void updateMembershipCard(BarcodeItem barcodeItem) {
+    public int updateMembershipCard(BarcodeItem barcodeItem) {
         SQLiteDatabase db = getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put(STORE, barcodeItem.getStoreName());
@@ -172,7 +178,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             values.put(BARCODE_FORMAT, barcodeItem.getBarcodeFormat());
             values.put(BARCODE_CONTENT, barcodeItem.getBarcodeContent());
         }
-        db.update(TABLE_MEMBERSHIP_CARD, values, CARD_ID + " = ? ",
+        return db.update(TABLE_MEMBERSHIP_CARD, values, CARD_ID + " = ? ",
                 new String[] {String.valueOf(barcodeItem.getId())});
     }
 

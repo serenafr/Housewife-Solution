@@ -24,6 +24,7 @@ import me.christine.sqlite.DatabaseHandler.DatabaseHandler;
 public class AddBarcodeActivity extends Activity {
     private int barcodeWidth = 800;
     private int barcodeHeight = 200;
+    private String CARDID;
     private String FORMAT = "Format";
     private String CONTENT = "Content";
     @Override
@@ -33,6 +34,14 @@ public class AddBarcodeActivity extends Activity {
 
         final EditText editText = (EditText) findViewById(R.id.add_store_for_card);
         setOnKeyListenerToEidtText(editText);
+
+        ImageView accept = (ImageView) findViewById(R.id.save_input);
+        accept.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showStoreName(editText.getText().toString());
+            }
+        });
 
         ImageView delete = (ImageView) findViewById(R.id.delete_input_store);
         delete.setOnClickListener(new View.OnClickListener() {
@@ -84,21 +93,22 @@ public class AddBarcodeActivity extends Activity {
     }
 
     private void setOnClickListenerToSaveButton(Button button) {
-        TextView textView = (TextView) findViewById(R.id.input_store_name);
-        ImageView imageView = (ImageView) findViewById(R.id.scanned_barcode);
-        if (textView != null && imageView != null) {
-            button.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
+        final TextView textView = (TextView) findViewById(R.id.input_store_name);
+        final ImageView imageView = (ImageView) findViewById(R.id.scanned_barcode);
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(textView != null && imageView != null) {
                     Intent resultIntent = new Intent();
+                    resultIntent.putExtra("Card Id", CARDID);
                     resultIntent.putExtra("Store Name", getStoreName());
                     resultIntent.putExtra("Barcode Format", FORMAT);
                     resultIntent.putExtra("Barcode Content", CONTENT);
                     setResult(RESULT_OK, resultIntent);
                     finish();
                 }
-            });
-        }
+            }
+        });
     }
 
     private String getStoreName() {
@@ -113,6 +123,7 @@ public class AddBarcodeActivity extends Activity {
 
     private void setInfoOnIntentReceived() {
         Intent intentFromMainActivity = getIntent();
+        CARDID = intentFromMainActivity.getStringExtra("Card Id");
         String storeName = intentFromMainActivity.getStringExtra("Store Name");
         String barcodeFormat = intentFromMainActivity.getStringExtra("Barcode Format");
         String barcodeContent = intentFromMainActivity.getStringExtra("Barcode Content");

@@ -1,13 +1,20 @@
 package me.christine.housewifesolution;
 
+import android.database.sqlite.SQLiteDatabase;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.widget.CursorAdapter;
 import android.content.Context;
 import android.view.View;
 import android.widget.ImageView;
+import android.content.Intent;
 import android.widget.TextView;
 import android.database.Cursor;
+import android.util.Log;
+
+import java.util.List;
+
+import me.christine.sqlite.DatabaseHandler.DatabaseHandler;
 
 /**
  * Created by christine on 15-5-12.
@@ -42,8 +49,8 @@ public class ItemAdapter extends CursorAdapter {
     }
 
     @Override
-    public View newView(Context context, Cursor cursor, ViewGroup parent) {
-        int position = cursor.getPosition();
+    public View newView(final Context context, Cursor cursor, ViewGroup parent) {
+        final int position = cursor.getPosition();
         int nViewType;
         boolean newGroup = isNewGroup(cursor, position);
         if(newGroup) {
@@ -51,10 +58,10 @@ public class ItemAdapter extends CursorAdapter {
         } else {
             nViewType = VIEW_TYPE_ITEM;
         }
-        View v;
+        View view;
         if(nViewType == VIEW_TYPE_WITH_HEADER) {
-            v = LayoutInflater.from(context).inflate(R.layout.store_separator, parent, false);
-            View header = v.findViewById(R.id.store_separator);
+            view = LayoutInflater.from(context).inflate(R.layout.store_separator, parent, false);
+            View header = view.findViewById(R.id.store_separator);
             header.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -62,15 +69,16 @@ public class ItemAdapter extends CursorAdapter {
                 }
             });
         } else {
-            v = LayoutInflater.from(context).inflate(R.layout.shopping_item_layout, parent, false);
+            view = LayoutInflater.from(context).inflate(R.layout.shopping_item_layout, parent, false);
         }
-        return v;
+        return view;
     }
 
     @Override
-    public void bindView(View view, Context context, Cursor cursor) {
+    public void bindView(final View view, final Context context, final Cursor cursor) {
         TextView tv;
         tv = (TextView) view.findViewById(R.id.itemName);
+        final int itemId = Integer.parseInt(cursor.getString(cursor.getColumnIndexOrThrow("item_id")));
         String name = cursor.getString(cursor.getColumnIndexOrThrow("item_name"));
         String store = cursor.getString(cursor.getColumnIndexOrThrow("store_name"));
         if (store == null) {
@@ -81,18 +89,15 @@ public class ItemAdapter extends CursorAdapter {
         if(tv != null) {
             tv.setText(store);
         }
-        //set onclicklistener for imageview delete_item
-        final String itemIdString = cursor.getString(cursor.getColumnIndexOrThrow("item_id"));
-        final int itemId = Integer.parseInt(itemIdString);
-        final String itemName = cursor.getString(cursor.getColumnIndexOrThrow("item_name"));
-        final String itemStore = cursor.getString(cursor.getColumnIndexOrThrow("store_name"));
-        final ShoppingItem shoppingItem = new ShoppingItem(itemId, itemName, itemStore);
         final ImageView imageView = (ImageView) view.findViewById(R.id.delete_item);
         imageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                MainActivity mainActivity = (MainActivity) v.getContext();
-                mainActivity.deleteShoppingItem(v, shoppingItem);
+                DatabaseHandler dh = new DatabaseHandler(context);
+                ShoppingListOperations shoppingListOperations = new ShoppingListOperations(dh);
+                ShoppingItem shoppingItem = dh.getShoppingItem(itemId);
+                shoppingListOperations.deleteShoppingItem(v, shoppingItem);
+                changeCursor(shoppingListOperations.getNewCursor());
             }
         });
     }

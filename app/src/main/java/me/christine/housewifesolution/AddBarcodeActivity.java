@@ -77,6 +77,7 @@ public class AddBarcodeActivity extends Activity {
         });
     }
 
+    //**************start scanning*************************//
     private void setOnClickListenerToBarcodeScanner(ImageView imageView) {
         imageView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -121,6 +122,7 @@ public class AddBarcodeActivity extends Activity {
         textView.setText("Store: " + storeName);
     }
 
+    //**********click on already stored card******************//
     private void setInfoOnIntentReceived() {
         Intent intentFromMainActivity = getIntent();
         CARDID = intentFromMainActivity.getStringExtra("Card Id");
@@ -136,6 +138,7 @@ public class AddBarcodeActivity extends Activity {
         }
     }
 
+    //Get scanned barcode from scan activity
     public void onActivityResult(int requestCode, int resultCode, Intent intent) {
         if (requestCode == 0) {
             if (resultCode == RESULT_OK) {

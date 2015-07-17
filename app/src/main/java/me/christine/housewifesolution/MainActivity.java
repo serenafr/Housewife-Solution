@@ -136,12 +136,14 @@ public class MainActivity extends Activity{
         });
     }
 
+    //**************** The following codes are for tab shopping list********************************
     public void setOnClickListenerforEditTextItemInput(final EditText editText) {
         editText.setOnKeyListener(new View.OnKeyListener() {
             @Override
             public boolean onKey(View v, int keyCode, KeyEvent event) {
                 if (event != null && event.getAction() == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_ENTER) {
                     String itemName = editText.getText().toString();
+                    editText.selectAll();// not working????
                     shoppingListOperations.addShoppingItems(itemName);
                     itemAdapter.changeCursor(shoppingListOperations.getNewCursor());
                     return true;
@@ -218,7 +220,6 @@ public class MainActivity extends Activity{
             String receivedBarcodeContent = receivedInfo.getString("Barcode Content");
             BarcodeItem barcodeItem = new BarcodeItem(receivedCardId, receivedStoreName, receivedBarcodeFormat, receivedBarcodeContent);
             dh.updateMembershipCard(barcodeItem);
-            Log.d("received info", barcodeItem.toString());
             refreshGridView(dh);
         }
     }

@@ -2,13 +2,7 @@ package me.christine.housewifesolution;
 
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.util.Log;
-import android.view.KeyEvent;
 import android.view.View;
-import android.widget.EditText;
-import android.content.Context;
-
-import java.util.List;
 
 import me.christine.sqlite.DatabaseHandler.DatabaseHandler;
 

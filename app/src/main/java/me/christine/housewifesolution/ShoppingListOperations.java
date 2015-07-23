@@ -24,6 +24,11 @@ public class ShoppingListOperations {
             dh.addShoppingItem(newItem);
         }
     }
+
+    public ShoppingItem getShoppingItemByID(int id) {
+        return dh.getShoppingItem(id);
+    }
+
     //ItemAdapter can use the returned cursor to change to a new cursor, so that the listview is refreshed
     public Cursor getNewCursor() {
         SQLiteDatabase db = dh.getWritableDatabase();
@@ -31,7 +36,11 @@ public class ShoppingListOperations {
         return newCursor;
     }
 
-    public void deleteShoppingItem(View view, ShoppingItem shoppingItem) {
+    public void deleteShoppingItem(ShoppingItem shoppingItem) {
         dh.deleteShoppingItem(shoppingItem);
+    }
+
+    public void editStoreName(ShoppingItem shoppingItem) {
+        dh.updateShoppingItem(shoppingItem);
     }
 }

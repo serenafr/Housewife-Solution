@@ -55,10 +55,8 @@ public class MainActivity extends Activity{
         final ListView listView = (ListView) findViewById(R.id.shopping_list);
         listView.setAdapter(itemAdapter);
         setOnItemClickListenerForListView(listView);
-        final EditText editTextItemInput = (EditText) findViewById(R.id.add_shopping_items);
-        setOnClickListenerforEditTextItemInput(editTextItemInput);
-        final ImageView imageViewDeleteItemInput = (ImageView) findViewById(R.id.delete_input_text);
-        setOnClickListenerforImageViewDeleteItemInput(imageViewDeleteItemInput);
+        setOnClickListenerforEditTextItemInput();
+        setOnClickListenerforImageViewDeleteItemInput();
 
         //cards tab
         GridView gridView = (GridView) findViewById(R.id.cards_grid_view);
@@ -136,7 +134,8 @@ public class MainActivity extends Activity{
     }
 
     //**************** The following codes are for tab shopping list********************************
-    public void setOnClickListenerforEditTextItemInput(final EditText editText) {
+    public void setOnClickListenerforEditTextItemInput() {
+        final EditText editText = (EditText) findViewById(R.id.add_shopping_items);
         editText.setOnKeyListener(new View.OnKeyListener() {
             @Override
             public boolean onKey(View v, int keyCode, KeyEvent event) {
@@ -152,7 +151,8 @@ public class MainActivity extends Activity{
         });
     }
 
-    public void setOnClickListenerforImageViewDeleteItemInput(final ImageView imageView) {
+    public void setOnClickListenerforImageViewDeleteItemInput() {
+        final ImageView imageView = (ImageView) findViewById(R.id.delete_input_text);
         imageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -194,10 +194,10 @@ public class MainActivity extends Activity{
             int receivedId = Integer.parseInt(receivedInfo.getString(ITEM_ID));
             String receivedStoreName = receivedInfo.getString(STORE_NAME);
             if (receivedStoreName != "") {
-                ShoppingItem shoppingItem = dh.getShoppingItem(receivedId);
+                ShoppingItem shoppingItem = shoppingListOperations.getShoppingItemByID(receivedId);
                 String itemName = shoppingItem.getName();
                 shoppingItem = new ShoppingItem(receivedId, itemName, receivedStoreName);
-                dh.updateShoppingItem(shoppingItem);
+                shoppingListOperations.editStoreName(shoppingItem);
                 itemAdapter.changeCursor(shoppingListOperations.getNewCursor());
             }
         }

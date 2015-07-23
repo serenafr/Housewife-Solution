@@ -96,7 +96,7 @@ public class ItemAdapter extends CursorAdapter {
                 DatabaseHandler dh = new DatabaseHandler(context);
                 ShoppingListOperations shoppingListOperations = new ShoppingListOperations(dh);
                 ShoppingItem shoppingItem = dh.getShoppingItem(itemId);
-                shoppingListOperations.deleteShoppingItem(v, shoppingItem);
+                shoppingListOperations.deleteShoppingItem(shoppingItem);
                 changeCursor(shoppingListOperations.getNewCursor());
             }
         });

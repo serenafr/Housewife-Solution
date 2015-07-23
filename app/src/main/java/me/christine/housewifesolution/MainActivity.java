@@ -21,7 +21,6 @@ import android.widget.TabHost;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
 import android.widget.Toast;
-import android.util.Log;
 
 import me.christine.sqlite.DatabaseHandler.DatabaseHandler;
 
@@ -35,7 +34,8 @@ public class MainActivity extends Activity{
     public static final String ITEM_ID = "ItemId";
     private Tabs tabs;
     private DatabaseHandler dh = new DatabaseHandler(this);
-    private final ShoppingListOperations shoppingListOperations = new ShoppingListOperations(dh);;
+    private final ShoppingListOperations shoppingListOperations = new ShoppingListOperations(dh);
+    private final BarcodeGridOperations barcodeGridOperations = new BarcodeGridOperations(dh);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,7 +59,6 @@ public class MainActivity extends Activity{
         setOnClickListenerforEditTextItemInput(editTextItemInput);
         final ImageView imageViewDeleteItemInput = (ImageView) findViewById(R.id.delete_input_text);
         setOnClickListenerforImageViewDeleteItemInput(imageViewDeleteItemInput);
-        //shoppingListOperations.displayShoppingList(getWindow().getDecorView(), itemAdapter);
 
         //cards tab
         GridView gridView = (GridView) findViewById(R.id.cards_grid_view);
@@ -220,7 +219,8 @@ public class MainActivity extends Activity{
             String receivedBarcodeContent = receivedInfo.getString("Barcode Content");
             BarcodeItem barcodeItem = new BarcodeItem(receivedCardId, receivedStoreName, receivedBarcodeFormat, receivedBarcodeContent);
             dh.updateMembershipCard(barcodeItem);
-            refreshGridView(dh);
+            cardsAdapter.changeCursor(barcodeGridOperations.getNewCursor());
+            cardsAdapter.notifyDataSetChanged();
         }
     }
 
@@ -261,13 +261,6 @@ public class MainActivity extends Activity{
                 return false;
             }
         });*/
-    }
-
-    protected void refreshGridView(DatabaseHandler dh) {
-        SQLiteDatabase db = dh.getWritableDatabase();
-        Cursor newCursor = db.rawQuery("SELECT rowid _id,* FROM membershipcard", null);
-        cardsAdapter.changeCursor(newCursor);
-        cardsAdapter.notifyDataSetChanged();
     }
 }
 

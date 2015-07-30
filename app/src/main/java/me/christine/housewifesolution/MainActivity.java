@@ -21,6 +21,9 @@ import android.widget.TabHost;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
 import android.widget.Toast;
+import android.util.Log;
+
+import java.util.List;
 
 import me.christine.sqlite.DatabaseHandler.DatabaseHandler;
 
@@ -208,7 +211,7 @@ public class MainActivity extends Activity{
             String receivedBarcodeFormat = receivedInfo.getString("Barcode Format");
             String receivedBarcodeContent = receivedInfo.getString("Barcode Content");
             BarcodeItem barcodeItem = new BarcodeItem(receivedStoreName, receivedBarcodeFormat, receivedBarcodeContent);
-            dh.createBarcodeItem(barcodeItem);
+            barcodeGridOperations.addBarcodeItem(barcodeItem);
         }
 
         if (requestCode == EIDT_STORE_OR_BARCODE && resultCode == RESULT_OK && data != null) {
@@ -218,7 +221,7 @@ public class MainActivity extends Activity{
             String receivedBarcodeFormat = receivedInfo.getString("Barcode Format");
             String receivedBarcodeContent = receivedInfo.getString("Barcode Content");
             BarcodeItem barcodeItem = new BarcodeItem(receivedCardId, receivedStoreName, receivedBarcodeFormat, receivedBarcodeContent);
-            dh.updateMembershipCard(barcodeItem);
+            barcodeGridOperations.editBarcodeItem(barcodeItem);
             cardsAdapter.changeCursor(barcodeGridOperations.getNewCursor());
             cardsAdapter.notifyDataSetChanged();
         }
@@ -227,7 +230,6 @@ public class MainActivity extends Activity{
     //******************* The following codes are for operations in tab cards***********************//
 
     public void startAddBarcodeActivity(View view) {
-
         Intent intent = new Intent(MainActivity.this, AddBarcodeActivity.class);
         startActivityForResult(intent, ADD_STORE_AND_BARCODE);
     }
@@ -252,15 +254,18 @@ public class MainActivity extends Activity{
     }
 
     private void setOnItemLongClickListenerForGridView(final GridView gridView) {
-        /*gridView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+        gridView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-                DatabaseHandler dh = new DatabaseHandler(getBaseContext());
                 Cursor cursor = (Cursor) gridView.getItemAtPosition(position);
-                dh.deleteBarcodeItem();
-                return false;
+                int cardId = cursor.getInt(0);
+                Log.d("Card id is", cardId + "");
+                BarcodeItem barcodeItem = barcodeGridOperations.getBarcodeItemById(cardId);
+                barcodeGridOperations.deleteBarcodeItem(barcodeItem);
+                barcodeGridOperations.refreshGridView(cardsAdapter);
+                return true;
             }
-        });*/
+        });
     }
 }
 

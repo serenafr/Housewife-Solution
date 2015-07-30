@@ -2,7 +2,6 @@ package me.christine.housewifesolution;
 
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.view.View;
 
 import me.christine.sqlite.DatabaseHandler.DatabaseHandler;
 

@@ -27,7 +27,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
     private static final String STORE = "store_name";
 
-    private static final String CARD_ID = "card_id";
+    private static final String CARD_ID = "rowid";
     private static final String BARCODE_FORMAT = "barcode_format";
     private static final String BARCODE_CONTENT = "barcode_content";
 
@@ -36,10 +36,19 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     }
 
     public void onCreate(SQLiteDatabase db) {
-        String CREATE_SHOPPINGLIST_TABLE = "CREATE TABLE " + TABLE_SHOPPING_LIST + "("
-                + SHOPPING_LIST_ID + " INTEGER PRIMARY KEY," + SHOPPING_LIST_NAME + " TEXT," + STORE + " TEXT" + ")";
-        String CREATE_MEMBERSHIP_CARD_TABLE = "CREATE TABLE " + TABLE_MEMBERSHIP_CARD + "("
-                + CARD_ID + " LONG PRIMARY KEY," + STORE + " TEXT," + BARCODE_FORMAT + " TEXT," + BARCODE_CONTENT + " TEXT" + ")";
+        String CREATE_SHOPPINGLIST_TABLE = "CREATE TABLE " + TABLE_SHOPPING_LIST +
+                "(" + SHOPPING_LIST_ID +
+                " INTEGER PRIMARY KEY," +
+                SHOPPING_LIST_NAME + " TEXT," +
+                STORE + " TEXT" + ")";
+
+        String CREATE_MEMBERSHIP_CARD_TABLE = "CREATE TABLE " + TABLE_MEMBERSHIP_CARD +
+                "(" + CARD_ID +
+                " INTEGER PRIMARY KEY," +
+                STORE + " TEXT," +
+                BARCODE_FORMAT + " TEXT," +
+                BARCODE_CONTENT + " TEXT" + ")";
+
         db.execSQL(CREATE_SHOPPINGLIST_TABLE);
         db.execSQL(CREATE_MEMBERSHIP_CARD_TABLE);
     }
@@ -66,8 +75,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     public ShoppingItem getShoppingItem(int id) {
         SQLiteDatabase db = this.getReadableDatabase();
         ShoppingItem shoppingItem;
-        Cursor cursor = db.query(TABLE_SHOPPING_LIST, new String[] {SHOPPING_LIST_ID, SHOPPING_LIST_NAME, STORE},
-                SHOPPING_LIST_ID + "=?", new String[] {String.valueOf(id)}, null, null, null, null);
+        Cursor cursor = db.query(TABLE_SHOPPING_LIST,
+                new String[]{SHOPPING_LIST_ID, SHOPPING_LIST_NAME, STORE},
+                SHOPPING_LIST_ID + "=?", new String[]{String.valueOf(id)},
+                null, null, null, null);
         if (cursor.moveToFirst()) {
             shoppingItem = new ShoppingItem(
                     cursor.getInt(cursor.getColumnIndexOrThrow(SHOPPING_LIST_ID)),
@@ -123,7 +134,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
     //****************************mebershipcard table methods***********************************//
     public void createBarcodeItem(BarcodeItem barcodeItem) {
-        SQLiteDatabase db = getWritableDatabase();
+        SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
         values.put(STORE, barcodeItem.getStoreName());
@@ -132,30 +143,35 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             values.put(BARCODE_CONTENT, barcodeItem.getBarcodeContent());
         }
         long barcodeId = db.insert(TABLE_MEMBERSHIP_CARD, null, values);
-        barcodeItem.setId(barcodeId);
+        barcodeItem.setId((int) barcodeId);
         db.close();
     }
 
     public BarcodeItem getBarcodeItem(int id) {
-        SQLiteDatabase db = getReadableDatabase();
-        String selectQuery = "SELECT * FROM " + TABLE_MEMBERSHIP_CARD + "WHERE "
-                + CARD_ID + " = " + id;
-        Cursor cursor = db.rawQuery(selectQuery, null);
-        if (cursor != null) {
-            cursor.moveToFirst();
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.query(TABLE_MEMBERSHIP_CARD,
+                new String[] {CARD_ID, STORE, BARCODE_FORMAT, BARCODE_CONTENT},
+                CARD_ID + "=?",
+                new String[] {String.valueOf(id)},
+                null, null, null, null);
+        if (cursor.moveToNext()) {
+            BarcodeItem barcodeItem = new BarcodeItem(
+                    cursor.getInt(cursor.getColumnIndexOrThrow(CARD_ID)),
+                    cursor.getString(cursor.getColumnIndexOrThrow(STORE)),
+                    cursor.getString(cursor.getColumnIndexOrThrow(BARCODE_FORMAT)),
+                    cursor.getString(cursor.getColumnIndexOrThrow(BARCODE_CONTENT)));
+            return barcodeItem;
         }
-        BarcodeItem barcodeItem = new BarcodeItem();
-        barcodeItem.setId(cursor.getColumnIndexOrThrow(CARD_ID));
-        barcodeItem.setStoreName(cursor.getString(cursor.getColumnIndexOrThrow(STORE)));
-        barcodeItem.addBarcode(cursor.getString(cursor.getColumnIndexOrThrow(BARCODE_FORMAT)),
-                cursor.getString(cursor.getColumnIndexOrThrow(BARCODE_CONTENT)));
-        return barcodeItem;
+        if (cursor.getCount() == 0) {
+            Log.d("Ah oh", "cursor is null");
+        }
+        return null;
     }
 
     public List<BarcodeItem> getAllCards() {
-        SQLiteDatabase db = getReadableDatabase();
+        SQLiteDatabase db = this.getReadableDatabase();
         List<BarcodeItem> cards = new ArrayList<BarcodeItem>();
-        String selectQuery = "SELECT * FROM" + TABLE_MEMBERSHIP_CARD;
+        String selectQuery = "SELECT * FROM " + TABLE_MEMBERSHIP_CARD;
         Cursor cursor = db.rawQuery(selectQuery, null);
         if (cursor.moveToFirst()) {
             do {
@@ -171,7 +187,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     }
 
     public int updateMembershipCard(BarcodeItem barcodeItem) {
-        SQLiteDatabase db = getWritableDatabase();
+        SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put(STORE, barcodeItem.getStoreName());
         if (barcodeItem.getBarcodeFormat() != null && barcodeItem.getBarcodeContent() != null) {
@@ -183,7 +199,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     }
 
     public void deleteBarcodeItem(BarcodeItem barcodeItem) {
-        SQLiteDatabase db = getWritableDatabase();
+        SQLiteDatabase db = this.getWritableDatabase();
+        Log.d("Deleting item", barcodeItem.getId() + "");
         db.delete(TABLE_MEMBERSHIP_CARD, CARD_ID + " = ? ",
                 new String[] {String.valueOf(barcodeItem.getId())});
         db.close();

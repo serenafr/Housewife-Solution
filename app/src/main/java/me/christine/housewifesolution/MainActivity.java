@@ -263,12 +263,33 @@ public class MainActivity extends Activity{
     private void setOnItemLongClickListenerForGridView(final GridView gridView) {
         gridView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
-            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-                Cursor cursor = (Cursor) gridView.getItemAtPosition(position);
-                int cardId = cursor.getInt(0);
-                BarcodeItem barcodeItem = barcodeGridOperations.getBarcodeItemById(cardId);
-                barcodeGridOperations.deleteBarcodeItem(barcodeItem);
-                barcodeGridOperations.refreshGridView(cardsAdapter);
+            public boolean onItemLongClick(AdapterView<?> parent, View view, final int position, long id) {
+                PopupMenu popup;
+                popup = new PopupMenu(MainActivity.this, view);
+                MenuInflater inflater = popup.getMenuInflater();
+                inflater.inflate(R.menu.menu_confrim_delete, popup.getMenu());
+                popup.show();
+                popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem item) {
+                        int itemId = item.getItemId();
+                        switch (itemId) {
+                            case R.id.confirm_delete:
+                                Cursor cursor = (Cursor) gridView.getItemAtPosition(position);
+                                int cardId = cursor.getInt(0);
+                                BarcodeItem barcodeItem = barcodeGridOperations.getBarcodeItemById(cardId);
+                                barcodeGridOperations.deleteBarcodeItem(barcodeItem);
+                                barcodeGridOperations.refreshGridView(cardsAdapter);
+                                break;
+                            case R.id.confirm_cancel:
+                                Toast.makeText(MainActivity.this, "Delete is cancelled", Toast.LENGTH_LONG);
+                                break;
+                            default:
+                                break;
+                        }
+                        return true;
+                    }
+                });
                 return true;
             }
         });

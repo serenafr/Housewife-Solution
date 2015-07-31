@@ -3,7 +3,7 @@
     android:id="@+id/cards_content_layout"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="wrap_content">
 
     <GridView
         android:id="@+id/cards_grid_view"
@@ -21,6 +21,5 @@
         android:layout_height="wrap_content"
         android:background="@drawable/ic_action_new_dark"
         android:layout_margin="10dp"
-        android:onClick="startAddBarcodeActivity"
-        />
+        android:onClick="startAddBarcodeActivity" />
 </LinearLayout>

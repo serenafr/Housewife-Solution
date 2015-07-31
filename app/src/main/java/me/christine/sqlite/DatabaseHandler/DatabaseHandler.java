@@ -160,10 +160,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                     cursor.getString(cursor.getColumnIndexOrThrow(STORE)),
                     cursor.getString(cursor.getColumnIndexOrThrow(BARCODE_FORMAT)),
                     cursor.getString(cursor.getColumnIndexOrThrow(BARCODE_CONTENT)));
+            db.close();
             return barcodeItem;
-        }
-        if (cursor.getCount() == 0) {
-            Log.d("Ah oh", "cursor is null");
         }
         return null;
     }
@@ -195,12 +193,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             values.put(BARCODE_CONTENT, barcodeItem.getBarcodeContent());
         }
         return db.update(TABLE_MEMBERSHIP_CARD, values, CARD_ID + " = ? ",
-                new String[] {String.valueOf(barcodeItem.getId())});
+                new String[]{String.valueOf(barcodeItem.getId())});
     }
 
     public void deleteBarcodeItem(BarcodeItem barcodeItem) {
         SQLiteDatabase db = this.getWritableDatabase();
-        Log.d("Deleting item", barcodeItem.getId() + "");
         db.delete(TABLE_MEMBERSHIP_CARD, CARD_ID + " = ? ",
                 new String[] {String.valueOf(barcodeItem.getId())});
         db.close();

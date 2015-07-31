@@ -59,6 +59,14 @@ public class BarcodeItem {
         this._storeName = name;
     }
 
+    public void setBarcodeFormat(String format) {
+        this._barcodeFormat = format;
+    }
+
+    public void setBarcodeContent(String content) {
+        this._barcodeContent = content;
+    }
+
     public void addBarcode(String format, String content) {
         this._barcodeFormat = format;
         this._barcodeContent = content;

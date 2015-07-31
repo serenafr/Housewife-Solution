@@ -23,8 +23,6 @@ import android.widget.TextView.OnEditorActionListener;
 import android.widget.Toast;
 import android.util.Log;
 
-import java.util.List;
-
 import me.christine.sqlite.DatabaseHandler.DatabaseHandler;
 
 public class MainActivity extends Activity{
@@ -210,8 +208,11 @@ public class MainActivity extends Activity{
             String receivedStoreName = receivedInfo.getString("Store Name");
             String receivedBarcodeFormat = receivedInfo.getString("Barcode Format");
             String receivedBarcodeContent = receivedInfo.getString("Barcode Content");
-            BarcodeItem barcodeItem = new BarcodeItem(receivedStoreName, receivedBarcodeFormat, receivedBarcodeContent);
-            barcodeGridOperations.addBarcodeItem(barcodeItem);
+            if(receivedBarcodeContent != null && receivedBarcodeFormat != null) {
+                BarcodeItem barcodeItem = new BarcodeItem(receivedStoreName, receivedBarcodeFormat, receivedBarcodeContent);
+                barcodeGridOperations.addBarcodeItem(barcodeItem);
+                barcodeGridOperations.refreshGridView(cardsAdapter);
+            }
         }
 
         if (requestCode == EIDT_STORE_OR_BARCODE && resultCode == RESULT_OK && data != null) {
@@ -220,10 +221,18 @@ public class MainActivity extends Activity{
             String receivedStoreName = receivedInfo.getString("Store Name");
             String receivedBarcodeFormat = receivedInfo.getString("Barcode Format");
             String receivedBarcodeContent = receivedInfo.getString("Barcode Content");
-            BarcodeItem barcodeItem = new BarcodeItem(receivedCardId, receivedStoreName, receivedBarcodeFormat, receivedBarcodeContent);
+            BarcodeItem barcodeItem = barcodeGridOperations.getBarcodeItemById(receivedCardId);
+            if (barcodeItem.getStoreName() != receivedStoreName) {
+                barcodeItem.setStoreName(receivedStoreName);
+            }
+            if (barcodeItem.getBarcodeFormat() != receivedBarcodeFormat) {
+                barcodeItem.setBarcodeFormat(receivedBarcodeFormat);
+            }
+            if (barcodeItem.getBarcodeContent() != receivedBarcodeContent) {
+                barcodeItem.setBarcodeContent(receivedBarcodeContent);
+            }
             barcodeGridOperations.editBarcodeItem(barcodeItem);
-            cardsAdapter.changeCursor(barcodeGridOperations.getNewCursor());
-            cardsAdapter.notifyDataSetChanged();
+            barcodeGridOperations.refreshGridView(cardsAdapter);
         }
     }
 
@@ -240,14 +249,12 @@ public class MainActivity extends Activity{
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Cursor cursor = (Cursor) gridView.getItemAtPosition(position);
                 String cardId = cursor.getString(0);
-                String storeName = cursor.getString(cursor.getColumnIndexOrThrow("store_name"));
-                String barcodeFormat = cursor.getString(cursor.getColumnIndexOrThrow("barcode_format"));
-                String barcodeContent = cursor.getString(cursor.getColumnIndexOrThrow("barcode_content"));
                 Intent intent = new Intent(MainActivity.this, AddBarcodeActivity.class);
                 intent.putExtra("Card Id", cardId);
-                intent.putExtra("Store Name", storeName);
-                intent.putExtra("Barcode Format", barcodeFormat);
-                intent.putExtra("Barcode Content", barcodeContent);
+                BarcodeItem barcodeItem = barcodeGridOperations.getBarcodeItemById(Integer.parseInt(cardId));
+                intent.putExtra("Store Name", barcodeItem.getStoreName());
+                intent.putExtra("Barcode Format", barcodeItem.getBarcodeFormat());
+                intent.putExtra("Barcode Content", barcodeItem.getBarcodeContent());
                 startActivityForResult(intent, EIDT_STORE_OR_BARCODE);
             }
         });
@@ -259,7 +266,6 @@ public class MainActivity extends Activity{
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
                 Cursor cursor = (Cursor) gridView.getItemAtPosition(position);
                 int cardId = cursor.getInt(0);
-                Log.d("Card id is", cardId + "");
                 BarcodeItem barcodeItem = barcodeGridOperations.getBarcodeItemById(cardId);
                 barcodeGridOperations.deleteBarcodeItem(barcodeItem);
                 barcodeGridOperations.refreshGridView(cardsAdapter);

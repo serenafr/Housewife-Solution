@@ -25,8 +25,11 @@ public class AddBarcodeActivity extends Activity {
     private int barcodeWidth = 800;
     private int barcodeHeight = 200;
     private String CARDID;
-    private String FORMAT = "Format";
-    private String CONTENT = "Content";
+    private String STORE;
+    private String FORMAT = "Barcode Format";
+    private String CONTENT = "Barcode Content";
+    DatabaseHandler dh = new DatabaseHandler(this);
+    BarcodeGridOperations barcodeGridOperations = new BarcodeGridOperations(dh);
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -94,27 +97,26 @@ public class AddBarcodeActivity extends Activity {
     }
 
     private void setOnClickListenerToSaveButton(Button button) {
-        final TextView textView = (TextView) findViewById(R.id.input_store_name);
-        final ImageView imageView = (ImageView) findViewById(R.id.scanned_barcode);
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(textView != null && imageView != null) {
-                    Intent resultIntent = new Intent();
+                Intent resultIntent = new Intent();
+                TextView storeNameText = (TextView) findViewById(R.id.input_store_name);
+                String storeName = storeNameText.getText().toString();
+                TextView barcodeFormatText = (TextView) findViewById(R.id.barcode_type);
+                String barcodeFormat = barcodeFormatText.getText().toString();
+                TextView barcodeContentText = (TextView) findViewById(R.id.barcode_content);
+                String barcodeContent = barcodeContentText.getText().toString();
+                if (barcodeContent.length() > 0 && barcodeFormat.length() > 0) {
                     resultIntent.putExtra("Card Id", CARDID);
-                    resultIntent.putExtra("Store Name", getStoreName());
-                    resultIntent.putExtra("Barcode Format", FORMAT);
-                    resultIntent.putExtra("Barcode Content", CONTENT);
+                    resultIntent.putExtra("Store Name", storeName);
+                    resultIntent.putExtra("Barcode Format", barcodeFormat);
+                    resultIntent.putExtra("Barcode Content", barcodeContent);
                     setResult(RESULT_OK, resultIntent);
-                    finish();
                 }
+                finish();
             }
         });
-    }
-
-    private String getStoreName() {
-        EditText editText = (EditText) findViewById(R.id.add_store_for_card);
-        return editText.getText().toString();
     }
 
     private void showStoreName(String storeName) {
@@ -126,15 +128,19 @@ public class AddBarcodeActivity extends Activity {
     private void setInfoOnIntentReceived() {
         Intent intentFromMainActivity = getIntent();
         CARDID = intentFromMainActivity.getStringExtra("Card Id");
-        String storeName = intentFromMainActivity.getStringExtra("Store Name");
-        String barcodeFormat = intentFromMainActivity.getStringExtra("Barcode Format");
-        String barcodeContent = intentFromMainActivity.getStringExtra("Barcode Content");
-        if (storeName != null) {
-            TextView textView = (TextView) findViewById(R.id.input_store_name);
-            textView.setText(storeName);
-        }
-        if (barcodeFormat != null && barcodeContent != null) {
-            showBarcode(barcodeFormat, barcodeContent);
+        if (CARDID != null) {
+            int card_id = Integer.parseInt(CARDID);
+            BarcodeItem barcodeItem = barcodeGridOperations.getBarcodeItemById(card_id);
+            STORE = barcodeItem.getStoreName();
+            FORMAT = barcodeItem.getBarcodeFormat();
+            CONTENT = barcodeItem.getBarcodeContent();
+            if (STORE != null) {
+                TextView textView = (TextView) findViewById(R.id.input_store_name);
+                textView.setText(STORE);
+            }
+            if (FORMAT != null && CONTENT != null) {
+                showBarcode(FORMAT, CONTENT);
+            }
         }
     }
 
